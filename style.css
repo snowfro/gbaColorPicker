@@ -1,0 +1,127 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #f4f4f4;
+    user-select: none; /* Prevent text selection during drag */
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.color-picker-container {
+    display: flex;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    gap: 20px;
+    align-items: center;
+}
+
+.picker-area {
+    display: flex;
+    gap: 10px;
+}
+
+/* Saturation/Value Box */
+#saturation-value-box {
+    width: 512px;  /* Doubled */
+    height: 512px; /* Doubled */
+    position: relative;
+    cursor: crosshair;
+    border: 1px solid #ccc;
+    /* Hue background color removed */
+    /* ADDED: Use CSS Grid */
+    display: grid;
+    grid-template-columns: repeat(32, 1fr);
+    grid-template-rows: repeat(32, 1fr);
+    gap: 0;
+}
+
+/* sv-overlay-white styles removed */
+/* sv-overlay-black styles removed */
+/* picker-cursor styles removed */
+
+/* ADDED: Style for individual SV blocks */
+.sv-block {
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.05); /* Subtle grid lines */
+}
+
+/* Hue Slider */
+#hue-slider {
+    width: 60px;
+    height: 512px;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    /* background: linear-gradient(...) removed */
+}
+
+#hue-blocks-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.hue-block {
+    flex: 1; /* Distribute height evenly */
+    width: 100%;
+    /* Add a subtle border to distinguish blocks */
+    box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.1);
+}
+
+/* Info Area */
+.info-area {
+    display: flex;
+    flex-direction: column;
+    width: 150px; /* Give it some defined width */
+}
+
+.selected-color-display {
+    /* Make this a flex container to control its children */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align children (text, box) to the right */
+    width: 100%; /* Take full width of info-area */
+}
+
+.selected-color-display p {
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-align: right; /* Explicitly right-align */
+    width: 100%; /* Ensure it takes full width for alignment */
+}
+
+#selected-color-preview {
+    width: 100%; /* Take full width */
+    padding-top: 100%; /* Create square using padding hack (aspect-ratio) */
+    height: 0; /* Required for padding hack */
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    background-color: black; /* Initial */
+    border-radius: 4px;
+}
+
+#selected-color-value-15bit {
+    font-family: monospace;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: right; /* Right-align */
+    width: 100%;
+}
+
+#selected-color-value-rgb8bit {
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #555;
+    text-align: right; /* Right-align */
+    width: 100%;
+} 
