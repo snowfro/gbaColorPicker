@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hueBlocksContainer = document.getElementById('hue-blocks-container');
     const colorPreview = document.getElementById('selected-color-preview');
     const value15bitSpan = document.getElementById('selected-color-value-15bit');
+    const valueHex8bitSpan = document.getElementById('selected-color-value-hex8bit');
     const valueRgb8bitSpan = document.getElementById('selected-color-value-rgb8bit');
 
     // Restore HSV state variables
@@ -84,9 +85,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get 15-bit hex value of the GBA color
         const hex15 = gbaRgb5ToHex15(gba5.r5, gba5.g5, gba5.b5);
 
+        // ADDED: Convert 8-bit GBA color components to standard hex
+        const rHex = gba8Display.r.toString(16).padStart(2, '0');
+        const gHex = gba8Display.g.toString(16).padStart(2, '0');
+        const bHex = gba8Display.b.toString(16).padStart(2, '0');
+        const hex8bit = `#${rHex}${gHex}${bHex}`.toUpperCase();
+
         // Update preview and text
         colorPreview.style.backgroundColor = `rgb(${gba8Display.r}, ${gba8Display.g}, ${gba8Display.b})`;
         value15bitSpan.textContent = hex15;
+        valueHex8bitSpan.textContent = hex8bit;
         valueRgb8bitSpan.textContent = `(RGB: ${gba8Display.r}, ${gba8Display.g}, ${gba8Display.b})`;
     }
 

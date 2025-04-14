@@ -118,6 +118,15 @@ h1 {
     width: 100%;
 }
 
+#selected-color-value-hex8bit {
+    font-family: monospace;
+    font-size: 1.0em; /* Slightly smaller than 15bit */
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: right;
+    width: 100%;
+}
+
 #selected-color-value-rgb8bit {
     font-family: monospace;
     font-size: 0.9em;
