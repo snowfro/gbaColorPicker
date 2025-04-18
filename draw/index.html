@@ -77,6 +77,14 @@
 
     <!-- Scripts -->
     <script src="../script.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Ensure the parent script is loaded first
+        window.addEventListener('load', function() {
+            // Create a new script element
+            const drawScript = document.createElement('script');
+            drawScript.src = 'script.js';
+            document.body.appendChild(drawScript);
+        });
+    </script>
 </body>
 </html> 
