@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Make title editable on click
     if (artworkTitle) {
+        // Mouse click event for title editing
         artworkTitle.addEventListener('click', function(e) {
             // Only proceed if we clicked on the text or edit icon
             if (e.target === this || e.target.classList.contains('edit-icon')) {
@@ -88,6 +89,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+        
+        // Touch event for title editing
+        artworkTitle.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            // Prevent double-firing with click event
+            e.stopPropagation();
+            
+            // Only proceed if we tapped on the text or edit icon
+            if (e.target === this || e.target.classList.contains('edit-icon')) {
+                const currentTitle = this.childNodes[0].nodeValue.trim();
+                const newTitle = prompt("Enter a new title for your artwork:", currentTitle);
+                
+                if (newTitle !== null && newTitle.trim() !== "") {
+                    this.childNodes[0].nodeValue = newTitle.trim() + " ";
+                }
+            }
+        }, { passive: false });
     }
 
     // --- Grid & Drawing State ---
@@ -477,6 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resizeButton.addEventListener('click', setupCanvas);
 
+    // --- Mouse Events ---
     canvas.addEventListener('mousedown', (e) => {
         // Save current state before drawing
         saveToHistory();
@@ -498,6 +517,51 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('mouseleave', () => {
         isDrawing = false;
     });
+
+    // --- Touch Events for Mobile/iPad ---
+    canvas.addEventListener('touchstart', (e) => {
+        // Prevent default to stop scrolling
+        e.preventDefault();
+        
+        // Save current state before drawing
+        saveToHistory();
+        
+        isDrawing = true;
+        
+        // Convert touch position to canvas coordinates
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        
+        drawPixel(getCoords(mouseEvent).cellX, getCoords(mouseEvent).cellY);
+    }, { passive: false }); // passive: false is needed to make preventDefault() work
+
+    canvas.addEventListener('touchmove', (e) => {
+        // Prevent default to stop scrolling
+        e.preventDefault();
+        
+        if (isDrawing) {
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            
+            drawPixel(getCoords(mouseEvent).cellX, getCoords(mouseEvent).cellY);
+        }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        isDrawing = false;
+    }, { passive: false });
+
+    canvas.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        isDrawing = false;
+    }, { passive: false });
 
     downloadPngBtn.addEventListener('click', downloadCanvasAsPNG);
     downloadJsonBtn.addEventListener('click', downloadPaletteAsJSON);

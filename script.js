@@ -209,6 +209,21 @@ document.addEventListener('DOMContentLoaded', () => {
         handleSvUpdate(e);
     });
 
+    // Touch event for SV Box
+    svBox.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDraggingSV = true;
+        
+        // Convert touch to mouse event
+        const touch = e.touches[0];
+        const mouseEvent = {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        };
+        
+        handleSvUpdate(mouseEvent);
+    }, { passive: false });
+
     // Hue Slider listeners
     hueSlider.addEventListener('mousedown', (e) => {
         isDraggingHue = true;
@@ -216,6 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // handleHueUpdate will check if the block actually changed
         handleHueUpdate(e);
     });
+    
+    // Touch event for Hue Slider
+    hueSlider.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDraggingHue = true;
+        
+        // Convert touch to mouse event
+        const touch = e.touches[0];
+        const mouseEvent = {
+            clientY: touch.clientY
+        };
+        
+        handleHueUpdate(mouseEvent);
+    }, { passive: false });
 
     // Global listeners for dragging
     window.addEventListener('mousemove', (e) => {
@@ -228,7 +257,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Global touch move listener
+    window.addEventListener('touchmove', (e) => {
+        if (isDraggingSV || isDraggingHue) {
+            e.preventDefault(); // Prevent scrolling when dragging
+            
+            const touch = e.touches[0];
+            const mouseEvent = {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            };
+            
+            if (isDraggingSV) {
+                handleSvUpdate(mouseEvent);
+            }
+            if (isDraggingHue) {
+                handleHueUpdate(mouseEvent);
+            }
+        }
+    }, { passive: false });
+
     window.addEventListener('mouseup', () => {
+        isDraggingSV = false;
+        isDraggingHue = false;
+    });
+    
+    // Touch end and cancel events
+    window.addEventListener('touchend', () => {
+        isDraggingSV = false;
+        isDraggingHue = false;
+    });
+    
+    window.addEventListener('touchcancel', () => {
         isDraggingSV = false;
         isDraggingHue = false;
     });
