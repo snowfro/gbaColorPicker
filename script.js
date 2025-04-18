@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const valueHex8bitSpan = document.getElementById('selected-color-value-hex8bit');
     const valueRgb8bitSpan = document.getElementById('selected-color-value-rgb8bit');
 
+    // Set global flag to indicate the color picker has been initialized
+    window.colorPickerInitialized = true;
+
     // Restore HSV state variables
     let hue = 0; // 0-360
     let saturation = 0; // 0-1 (Start at black/grey corner)

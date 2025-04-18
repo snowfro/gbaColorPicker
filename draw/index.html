@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GBA Pixel Art Editor</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/draw/style.css">
     <!-- We might want to share styles later, but let's keep them separate for now -->
-    <link rel="stylesheet" href="../style.css"> <!-- Link to parent styles for color picker -->
+    <link rel="stylesheet" href="/style.css"> <!-- Link to parent styles for color picker -->
 </head>
 <body>
     <h1>GBA Pixel Art Editor</h1>
@@ -76,15 +76,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="../script.js"></script>
-    <script>
-        // Ensure the parent script is loaded first
-        window.addEventListener('load', function() {
-            // Create a new script element
-            const drawScript = document.createElement('script');
-            drawScript.src = 'script.js';
-            document.body.appendChild(drawScript);
-        });
-    </script>
+    <script src="/script.js"></script>
+    <script src="/draw/script.js"></script>
 </body>
 </html> 
