@@ -379,6 +379,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Export Functions ---
     function downloadCanvasAsPNG() {
+        // Get current artwork title for the filename
+        let filename = 'pixel-art.png'; // Default filename
+        if (artworkTitle && artworkTitle.childNodes[0].nodeValue) {
+            // Get title text and clean it for use as a filename
+            const titleText = artworkTitle.childNodes[0].nodeValue.trim();
+            if (titleText) {
+                // Replace spaces and special chars with underscores, remove any non-alphanumeric chars
+                const safeFilename = titleText.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                filename = `${safeFilename}.png`;
+            }
+        }
+        
         // Create a temporary canvas at actual pixel size (1:1)
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = gridWidth;
@@ -411,15 +423,27 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Create the download link
         const downloadLink = document.createElement('a');
-        downloadLink.download = 'pixel-art.png';
+        downloadLink.download = filename;
         downloadLink.href = tempCanvas.toDataURL('image/png');
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-        console.log("PNG download complete");
+        console.log(`PNG download complete: ${filename}`);
     }
     
     function downloadPaletteAsJSON() {
+        // Get current artwork title for the filename
+        let filename = 'palette.json'; // Default filename
+        if (artworkTitle && artworkTitle.childNodes[0].nodeValue) {
+            // Get title text and clean it for use as a filename
+            const titleText = artworkTitle.childNodes[0].nodeValue.trim();
+            if (titleText) {
+                // Replace spaces and special chars with underscores, remove any non-alphanumeric chars
+                const safeFilename = titleText.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                filename = `${safeFilename}_palette.json`;
+            }
+        }
+        
         // Prepare the palette data
         const paletteArray = [];
         
@@ -457,6 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create JSON object with metadata
         const paletteJSON = {
             format: "GBA 15-bit (RGB555)",
+            title: artworkTitle ? artworkTitle.childNodes[0].nodeValue.trim() : "Untitled",
             palette: paletteArray,
             total_colors: paletteArray.length
         };
@@ -469,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const blobUrl = URL.createObjectURL(blob);
         
         const downloadLink = document.createElement('a');
-        downloadLink.download = 'palette.json';
+        downloadLink.download = filename;
         downloadLink.href = blobUrl;
         document.body.appendChild(downloadLink);
         downloadLink.click();
@@ -477,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Clean up blob URL to avoid memory leaks
         URL.revokeObjectURL(blobUrl);
-        console.log("Palette JSON download complete");
+        console.log(`JSON download complete: ${filename}`);
     }
 
     // --- Tool Selection Logic ---
