@@ -1,0 +1,241 @@
+body {
+    /* Override parent body styles if necessary, or keep them */
+    /* Example: display: flex; might be needed again depending on parent style */
+}
+
+/* Artwork title styles */
+#artwork-title {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    color: #444;
+    font-style: italic;
+}
+
+.edit-icon {
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0.5;
+    margin-left: 5px;
+    vertical-align: middle;
+    transition: opacity 0.2s;
+}
+
+.edit-icon:hover {
+    opacity: 1;
+}
+
+.app-container {
+    /* Switch to CSS Grid */
+    display: grid;
+    /* Updated grid areas to include palette */
+    grid-template-areas:
+        "picker    canvas"
+        "palette   canvas"
+        "controls  canvas"; /* Default: Portrait/Square layout */
+    /* Define column sizes */
+    grid-template-columns: auto 1fr; /* First column auto, Canvas takes rest */
+    /* Define row sizes (can be auto) */
+    grid-template-rows: auto auto auto;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+    align-items: start;
+}
+
+/* Assign elements to grid areas */
+.color-picker-container {
+    grid-area: picker;
+}
+
+/* Assign the palette to its own area */
+.used-colors-palette {
+    grid-area: palette;
+    margin: 0; /* Remove margin as grid gap handles spacing */
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    width: auto; /* Let grid control width */
+}
+
+.controls-panel {
+    grid-area: controls;
+    /* Style the panel itself */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center buttons within the panel */
+    gap: 15px; /* Space between control groups */
+    padding: 10px;
+    border: 1px solid #ddd; /* Optional border */
+    border-radius: 5px;
+    background-color: #f9f9f9; /* Optional background */
+}
+
+.drawing-area {
+    grid-area: canvas;
+    /* Remove flex stuff if it was added previously */
+    display: block; /* Or adjust as needed */
+    /* Align canvas within its area (optional) */
+    justify-self: center; /* Center canvas horizontally */
+    align-self: center;   /* Center canvas vertically */
+}
+
+.tools {
+    display: flex;
+    gap: 10px;
+}
+
+.tool-button {
+    padding: 8px 12px;
+    font-size: 1.5em;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tool-button.active {
+    background-color: #d0d0d0;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+#canvas-container {
+    /* Checkerboard background */
+    background-color: #eee; /* Fallback */
+    background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+                      linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, #ccc 75%),
+                      linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 20px 20px; /* Size of the checks */
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    /* Add border, padding etc. if needed */
+    border: 1px solid #888;
+    width: fit-content; /* Fit the canvas size */
+    height: fit-content;
+    margin: 0; /* Remove margin auto if present */
+}
+
+#pixel-canvas {
+    display: block; /* Remove extra space below canvas */
+    /* Size will be set by JS */
+}
+
+.export-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.export-buttons button {
+    padding: 8px 15px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    background-color: #e8e8e8;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.export-buttons button:hover {
+    background-color: #ddd;
+}
+
+/* Reuse color picker styles from ../style.css */
+/* Add overrides here if needed */
+
+/* --- Overrides for Color Picker Size in Drawing App --- */
+
+/* Target elements specifically inside .app-container */
+.app-container .color-picker-container {
+    /* Keep padding/gap small */
+    padding: 10px;
+    gap: 10px;
+    max-width: 400px; /* Limit width if needed */
+}
+
+.app-container #saturation-value-box {
+    width: 256px; /* Restore smaller size */
+    height: 256px;
+}
+
+.app-container #hue-slider {
+    width: 30px; /* Restore smaller size */
+    height: 256px;
+}
+
+.app-container .info-area {
+    width: 120px; /* Restore smaller size */
+}
+
+.app-container .selected-color-display p,
+.app-container #selected-color-value-15bit,
+.app-container #selected-color-value-hex8bit,
+.app-container #selected-color-value-rgb8bit {
+    font-size: 0.9em; /* Restore smaller font */
+}
+
+.app-container #selected-color-value-15bit {
+     font-size: 1.0em; /* Restore slightly larger 15bit font */
+}
+
+/* ADDED: Styles for Dimension Controls */
+.dimension-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+}
+
+.dimension-controls label {
+    font-size: 0.9em;
+}
+
+.dimension-controls input[type="number"] {
+    width: 60px; /* Adjust width as needed */
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.dimension-controls button {
+    padding: 4px 10px;
+    font-size: 0.9em;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.dimension-controls button:hover {
+    background-color: #e0e0e0;
+}
+
+/* --- Used Colors Palette --- */
+.palette-title {
+    font-size: 0.9em;
+    margin: 0 0 5px 0;
+    color: #333;
+    text-align: center;
+}
+
+#used-colors-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+.color-swatch {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.color-swatch:hover {
+    transform: scale(1.2);
+    border-color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+} 

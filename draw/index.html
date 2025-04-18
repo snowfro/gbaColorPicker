@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA Pixel Art Editor</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- We might want to share styles later, but let's keep them separate for now -->
+    <link rel="stylesheet" href="../style.css"> <!-- Link to parent styles for color picker -->
+</head>
+<body>
+    <h1>GBA Pixel Art Editor</h1>
+    <h3 id="artwork-title">Cosmic Harmony <span class="edit-icon" title="Click to edit">✏️</span></h3>
+
+    <div class="app-container">
+        <!-- Color Picker -->
+        <div class="color-picker-container">
+            <div class="picker-area">
+                <div id="saturation-value-box">
+                    <!-- Blocks added by JS -->
+                </div>
+                <div id="hue-slider">
+                    <div id="hue-blocks-container"></div>
+                </div>
+            </div>
+            
+            <!-- REMOVED: Used colors palette moved to its own container -->
+            
+            <div class="info-area">
+                <div class="selected-color-display">
+                    <p>Selected Color:</p>
+                    <div id="selected-color-preview"></div>
+                    <span id="selected-color-value-15bit">0x0000</span>
+                    <span id="selected-color-value-hex8bit">#000000</span>
+                    <span id="selected-color-value-rgb8bit">(RGB: 0, 0, 0)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADDED: Separate Palette Container -->
+        <div class="used-colors-palette" id="used-colors-container">
+            <p class="palette-title">Colors Used:</p>
+            <div id="used-colors-grid">
+                <!-- Dynamic color swatches will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="tools">
+                <button id="pencil-tool" class="tool-button active" title="Pencil">✏️</button>
+                <button id="eraser-tool" class="tool-button" title="Eraser">🧼</button>
+                <button id="undo-button" class="tool-button" title="Undo">↩️</button>
+                <!-- <button id="fill-tool" class="tool-button" title="Fill Bucket">💧</button> -->
+            </div>
+            <div class="dimension-controls">
+                <label for="width-input">Width:</label>
+                <input type="number" id="width-input" value="16" min="1" max="128">
+                <label for="height-input">Height:</label>
+                <input type="number" id="height-input" value="16" min="1" max="128">
+                <button id="resize-button">Set Size</button>
+            </div>
+            <div class="export-buttons">
+                <button id="download-png">Download PNG</button>
+                <button id="download-json">Download Palette JSON</button>
+            </div>
+        </div>
+
+        <!-- Drawing Area -->
+        <div class="drawing-area">
+            <div id="canvas-container">
+                <canvas id="pixel-canvas"></canvas>
+                <!-- Checkerboard background will be applied via CSS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../script.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
