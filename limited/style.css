@@ -1,0 +1,182 @@
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+.info-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.color-preview-box {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.color-value-text {
+    margin-right: 15px;
+    font-family: monospace;
+    font-size: 1.1em;
+}
+
+.export-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#download-json-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#download-json-button:hover {
+    background-color: #2980b9;
+}
+
+/* New styles for GBA palette layout */
+#gba-palettes-container {
+    display: flex;
+    flex-direction: column; /* Sections will stack vertically */
+    align-items: center; /* Center sections on the page */
+    gap: 30px; /* Space between the two main sections */
+}
+
+.palette-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Space between palette groups within a section */
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9; /* Slight background tint for sections */
+    width: 90%; /* Or a max-width */
+    max-width: 1200px; /* Adjust as needed */
+}
+
+.section-title {
+    width: 100%; /* Make title span full width of the section */
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 1.5em;
+}
+
+.palette-group {
+    padding: 5px; /* MODIFIED from 10px - Space inside each group */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: fit-content;
+}
+
+.palette-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: center;
+    color: #34495e;
+    font-size: 0.8em; /* MODIFIED from 0.9em */
+    line-height: 1.2; /* ADDED for better spacing with two lines */
+}
+
+.palette-subtitle {
+    font-size: 0.85em; /* Make subtitle a bit smaller than main title part */
+    font-weight: normal; /* Make subtitle less bold */
+    color: #555; /* Slightly lighter color for subtitle */
+    display: block; /* Ensure it takes its own line if not already by <br> */
+}
+
+.palette-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 30px); /* 4x4 grid for 16 colors */
+    gap: 2px;
+    border: 1px solid #ddd;
+}
+
+.color-block {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #eee;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    box-sizing: border-box; /* Ensure border doesn't add to size */
+}
+
+.color-block:hover {
+    transform: scale(1.1);
+    border-color: #999;
+    z-index: 10;
+    position: relative; /* Ensures hover effect is not clipped */
+}
+
+.transparent-block {
+    background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+                      linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, #ccc 75%),
+                      linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 10px 10px; /* Size of the checks */
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+}
+
+/* Old styles to remove (or comment out if you prefer) 
+#palette-display-area {
+    display: flex;
+    flex-direction: row; 
+    flex-wrap: wrap; 
+    align-items: flex-start; 
+    justify-content: center; 
+}
+
+.grayscale-strip {
+    display: flex;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hue-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: fit-content;
+}
+
+.hue-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #34495e;
+}
+
+.mini-matrix {
+    display: grid;
+    gap: 2px;
+    border: 1px solid #ddd;
+}
+*/ 

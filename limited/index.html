@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA 16-Color Palette Explorer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>GBA 16-Color Palette Explorer</h1>
+
+    <div class="info-container">
+        <p>Selected GBA Color:</p>
+        <div id="selected-color-preview" class="color-preview-box"></div>
+        <span id="selected-color-value-15bit" class="color-value-text">0x0000</span>
+        <span id="selected-color-value-hex8bit" class="color-value-text">#000000</span>
+        <span id="selected-color-value-rgb8bit" class="color-value-text">(RGB: 0, 0, 0)</span>
+    </div>
+
+    <div class="export-container">
+        <button id="download-json-button">Download All Palettes (JSON)</button>
+    </div>
+
+    <div id="gba-palettes-container">
+        <div id="dedicated-palettes-section" class="palette-section">
+            <h2 class="section-title">Dedicated Palettes (0-5)</h2>
+            <!-- Palettes 0-5 will be generated here -->
+        </div>
+        <div id="general-hue-palettes-section" class="palette-section">
+            <h2 class="section-title">General Hue Palettes (6-15)</h2>
+            <!-- Palettes 6-15 will be generated here -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
