@@ -1,0 +1,28 @@
+{
+    "rewrites": [
+      {
+        "source": "/sprite",
+        "destination": "/sprite/index.html"
+      },
+      {
+        "source": "/sprite/",
+        "destination": "/sprite/index.html"
+      },
+      {
+        "source": "/draw",
+        "destination": "/draw/index.html"
+      },
+      {
+        "source": "/draw/",
+        "destination": "/draw/index.html"
+      },
+      {
+        "source": "/limited",
+        "destination": "/limited/index.html"
+      },
+      {
+        "source": "/limited/",
+        "destination": "/limited/index.html"
+      }
+    ]
+  }
