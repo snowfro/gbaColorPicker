@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA Self-Sprite Editor</title>
+    <link rel="stylesheet" href="style.css"> 
+    <!-- Consider linking to a shared base style if many styles are common -->
+</head>
+<body>
+    <h1>GBA Self-Sprite Editor (16x32)</h1>
+    <h3 id="artwork-title">My Sprite <span class="edit-icon" title="Click to edit">✏️</span></h3>
+
+    <div class="app-container">
+        <!-- Color Selection Area - General Hue Palettes -->
+        <div class="fixed-palettes-container">
+            <div class="info-area">
+                <p>Selected GBA Color:</p>
+                <div id="selected-color-preview" class="color-preview-box"></div>
+                <span id="selected-color-value-15bit" class="color-value-text">0x0000</span>
+                <span id="selected-color-value-hex8bit" class="color-value-text">#000000</span>
+                <span id="selected-color-value-rgb8bit" class="color-value-text">(RGB: 0, 0, 0)</span>
+            </div>
+            <div id="general-hue-palettes-display">
+                <!-- The 10 general hue palettes will be generated here by script.js -->
+            </div>
+
+            <!-- Used Colors Palette - MOVED INSIDE fixed-palettes-container -->
+            <div class="used-colors-palette" id="used-colors-container">
+                <p class="palette-title">Colors Used (15 colors max):</p>
+                <div id="used-colors-grid">
+                    <!-- Dynamic color swatches will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Export Buttons - MOVED INSIDE fixed-palettes-container -->
+            <div class="export-buttons-panel">
+                <button id="download-png">Download PNG</button>
+                <button id="download-json">Download Used Colors (JSON)</button> 
+            </div>
+        </div>
+
+        <!-- Drawing Tools - New Location -->
+        <!-- MOVED INSIDE drawing-area 
+        <div class="drawing-tools-panel">
+            <button id="pencil-tool" class="tool-button active" title="Pencil">✏️</button>
+            <button id="eraser-tool" class="tool-button" title="Eraser">🧼</button>
+            <button id="undo-button" class="tool-button" title="Undo">↩️</button>
+        </div>
+        -->
+        
+        <!-- Drawing Area -->
+        <div class="drawing-area">
+            <!-- Drawing Tools - MOVED HERE -->
+            <div class="drawing-tools-panel">
+                <button id="pencil-tool" class="tool-button active" title="Pencil">✏️</button>
+                <button id="eraser-tool" class="tool-button" title="Eraser">🧼</button>
+                <button id="undo-button" class="tool-button" title="Undo">↩️</button>
+            </div>
+            <div id="canvas-container">
+                <canvas id="pixel-canvas"></canvas> 
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

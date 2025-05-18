@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dedicatedPalettesSection = document.getElementById('dedicated-palettes-section');
     const generalHuePalettesSection = document.getElementById('general-hue-palettes-section');
     const downloadJsonButton = document.getElementById('download-json-button');
+    const downloadStripPngButton = document.getElementById('download-strip-png-button');
 
     // --- Color Conversion Functions (from parent script.js) ---
     function hsvToRgb(h, s, v) {
@@ -284,8 +285,71 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('JSON download initiated.');
     }
 
+    function generateAndDownloadHueStripPng() {
+        const allGeneralHueColorsRaw = [];
+        // Palettes 6 through 15 are indices 6 through 15 in allPalettesGba5
+        for (let palIdx = 6; palIdx <= 15; palIdx++) {
+            if (allPalettesGba5[palIdx]) {
+                for (let colorIdx = 0; colorIdx < 16; colorIdx++) {
+                    const gba5 = allPalettesGba5[palIdx][colorIdx];
+                    if (gba5) { 
+                        allGeneralHueColorsRaw.push(gba5);
+                    } else {
+                        allGeneralHueColorsRaw.push({r5:0, g5:0, b5:0}); 
+                    }
+                }
+            }
+        }
+
+        if (allGeneralHueColorsRaw.length !== 160) {
+            console.error('Error: Expected 160 raw general hue colors, got', allGeneralHueColorsRaw.length);
+            alert('Could not generate PNG strip: Raw color data incomplete.');
+            return;
+        }
+
+        const stripColors = [];
+        // Add pure black as the first color
+        stripColors.push({r5:0, g5:0, b5:0});
+
+        // Add the first 159 colors from the general hue palettes
+        for (let i = 0; i < 159; i++) {
+            stripColors.push(allGeneralHueColorsRaw[i]);
+        }
+
+        // At this point, stripColors should have 1 (black) + 159 (hues) = 160 colors.
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 160;
+        canvas.height = 1;
+        const ctx = canvas.getContext('2d');
+
+        stripColors.forEach((gba5, index) => {
+            const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+            ctx.fillStyle = `rgb(${rgb8.r}, ${rgb8.g}, ${rgb8.b})`;
+            ctx.fillRect(index, 0, 1, 1);
+        });
+
+        try {
+            const dataUrl = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = 'general_hues_strip.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(dataUrl); // Clean up blob from memory, not strictly needed for dataURLs but good practice if it were a blob URL
+            console.log('PNG strip download initiated.');
+        } catch (e) {
+            console.error('Error generating PNG:', e);
+            alert('Failed to generate PNG. See console for details.');
+        }
+    }
+
     if (downloadJsonButton) {
         downloadJsonButton.addEventListener('click', downloadAllPalettesAsJson);
+    }
+    if (downloadStripPngButton) {
+        downloadStripPngButton.addEventListener('click', generateAndDownloadHueStripPng);
     }
 
     generatePaletteVisualization();
