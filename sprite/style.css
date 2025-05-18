@@ -269,4 +269,94 @@ h1, h3 {
     margin: 0 auto 15px auto;
     padding: 0 10px;
     line-height: 1.4;
+}
+
+/* --- Mobile Specific Styles --- */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column; /* Stack main sections vertically */
+    align-items: center;    /* Center them in the viewport */
+    gap: 20px;              /* Space between stacked sections */
+    padding: 10px;          /* Reduce overall padding */
+  }
+
+  .fixed-palettes-container,
+  .drawing-area {
+    width: 100%;        
+    max-width: 480px;   
+    height: auto;       
+    /* overflow-y: auto from .fixed-palettes-container will handle its internal scrolling */
+  }
+
+  .drawing-area { /* Ensure drawing area comes first on mobile */
+      order: -1;
+  }
+
+  /* Adjustments for the main color palette display */
+  #general-hue-palettes-display {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* More flexible wrapping */
+    gap: 5px;
+  }
+
+  .palette-grid { /* The 4x4 grid inside each palette group */
+    grid-template-columns: repeat(4, 22px); /* Slightly smaller color blocks */
+    gap: 1px;
+  }
+  .color-block {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Stack artwork title and selected color info on mobile */
+  .info-area {
+    flex-direction: column;
+    align-items: stretch; /* Make children take full width of info-area */
+    gap: 10px;
+  }
+  #artwork-title {
+    text-align: center; /* Center title on mobile */
+  }
+  .selected-color-details {
+    align-items: center; /* Center the block of color details */
+  }
+  .selected-color-details p { /* "Selected Color:" text */
+      text-align: center; /* Center this text too */
+  }
+
+  /* Ensure canvas container can scroll horizontally if canvas is too wide */
+  /* (though 320px canvas width should generally fit) */
+  #canvas-container {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .drawing-area {
+      padding: 10px; /* Ensure some padding around tools and canvas */
+  }
+
+  /* Adjust description text */
+  .description {
+    font-size: 0.85em;
+    max-width: 100%;
+    padding: 0 5px;
+    margin-bottom: 20px; /* More space below description */
+  }
+
+  /* Adjust used colors section */
+  .used-colors-palette {
+    min-height: 50px; /* Adjust min height to be less imposing if empty */
+    padding: 5px;
+  }
+  #used-colors-grid {
+    grid-template-columns: repeat(auto-fit, minmax(20px, 1fr)); /* Flexible swatch columns */
+  }
+
+  /* Make button panels wrap buttons if needed */
+  .drawing-tools-panel,
+  .export-buttons-panel { /* Note: export-buttons-panel is inside fixed-palettes-container */
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .export-buttons-panel {
+      margin-top: 15px; /* Ensure space above export buttons on mobile */
+  }
 } 
