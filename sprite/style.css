@@ -42,12 +42,22 @@ h1, h3 {
 /* Info Area (Selected Color Display) - From draw/index.html & limited/style.css */
 .info-area {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
     padding: 10px;
     background-color: #e9e9e9;
     border-radius: 6px;
+}
+
+#artwork-title {
+    margin: 0;
+}
+
+.selected-color-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .info-area p {
@@ -205,14 +215,11 @@ h1, h3 {
 
 /* Used Colors Palette - From draw/style.css */
 .used-colors-palette {
-    background-color: #fff;
     padding: 5px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     overflow-y: auto;
-    max-height: 20vh; 
-    width: 100%; 
-    box-sizing: border-box; 
+    min-height: 70px;
+    width: 100%;
+    box-sizing: border-box;
     margin-top: 10px;
 }
 
@@ -220,6 +227,7 @@ h1, h3 {
     font-size: 0.9em;
     color: #333;
     margin-bottom: 5px;
+    text-align: left;
 }
 
 #used-colors-grid {
@@ -251,4 +259,14 @@ h1, h3 {
     cursor: pointer;
     font-size: 0.8em;
     margin-left: 5px;
+}
+
+.description {
+    font-size: 0.9em;
+    color: #555;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 15px auto;
+    padding: 0 10px;
+    line-height: 1.4;
 } 

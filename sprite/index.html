@@ -8,18 +8,21 @@
     <!-- Consider linking to a shared base style if many styles are common -->
 </head>
 <body>
-    <h1>GBA Self-Sprite Editor (16x32)</h1>
-    <h3 id="artwork-title">My Sprite <span class="edit-icon" title="Click to edit">✏️</span></h3>
+    <h1>Self Portrait</h1>
+    <p class="description">Draw yourself in pixels! Pick colors in the palettes and place them on the canvas. Keep unused pixels transparent (don't fill around your drawing) and make sure there are no transparent pixels inside your drawing. You can use 15 colors max and there is a full grayscale color option at the end of each palette (starting with white on the first palette and black on the last palette). Once you're done, make sure to name it (click the pencil icon) and then hit "Download Bitmap String" and send it to me via email or DMs.</p>
 
     <div class="app-container">
         <!-- Color Selection Area - General Hue Palettes -->
         <div class="fixed-palettes-container">
             <div class="info-area">
-                <p>Selected GBA Color:</p>
-                <div id="selected-color-preview" class="color-preview-box"></div>
-                <span id="selected-color-value-15bit" class="color-value-text">0x0000</span>
-                <span id="selected-color-value-hex8bit" class="color-value-text">#000000</span>
-                <span id="selected-color-value-rgb8bit" class="color-value-text">(RGB: 0, 0, 0)</span>
+                <h3 id="artwork-title">My Sprite <span class="edit-icon" title="Click to edit">✏️</span></h3>
+                <div class="selected-color-details"> 
+                    <p>Selected Color:</p>
+                    <div id="selected-color-preview" class="color-preview-box"></div>
+                    <span id="selected-color-value-15bit" class="color-value-text">0x0000</span>
+                    <span id="selected-color-value-hex8bit" class="color-value-text">#000000</span>
+                    <span id="selected-color-value-rgb8bit" class="color-value-text">(RGB: 0, 0, 0)</span>
+                </div>
             </div>
             <div id="general-hue-palettes-display">
                 <!-- The 10 general hue palettes will be generated here by script.js -->
@@ -27,7 +30,7 @@
 
             <!-- Used Colors Palette - MOVED INSIDE fixed-palettes-container -->
             <div class="used-colors-palette" id="used-colors-container">
-                <p class="palette-title">Colors Used (15 colors max):</p>
+                <p class="palette-title">Colors Used:</p>
                 <div id="used-colors-grid">
                     <!-- Dynamic color swatches will be inserted here -->
                 </div>

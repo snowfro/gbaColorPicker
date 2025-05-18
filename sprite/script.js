@@ -437,40 +437,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Used Colors Palette (from draw/script.js, adapted) ---
     function updateUsedColorsPaletteDisplay() { 
-        usedColorsGrid.innerHTML = ''; // Clear previous swatches/placeholders
-        const MAX_USED_SWATCHES = 15;
+        usedColorsGrid.innerHTML = ''; // Clear previous swatches
         const actualUsedColorsArray = Array.from(usedColors);
 
-        for (let i = 0; i < MAX_USED_SWATCHES; i++) {
+        if (actualUsedColorsArray.length === 0) {
+            // Optional: Add a message or specific styling for empty state if desired
+            // For now, it will just be an empty grid.
+            return;
+        }
+
+        actualUsedColorsArray.forEach(colorHex15 => {
             const swatch = document.createElement('div');
             swatch.className = 'color-swatch';
 
-            if (i < actualUsedColorsArray.length) {
-                // This is an actual used color
-                const colorHex15 = actualUsedColorsArray[i];
-                const colorInt = gbaHex15ToInt(colorHex15);
-                const gba5 = gbaIntToGba5(colorInt);
-                const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
-                
-                swatch.style.backgroundColor = `rgb(${rgb8.r}, ${rgb8.g}, ${rgb8.b})`;
-                swatch.dataset.colorHex15 = colorHex15;
-                swatch.title = `${colorHex15} (R:${gba5.r5},G:${gba5.g5},B:${gba5.b5})`; // Add a title for hover info
-                swatch.addEventListener('click', () => { 
-                    updateSelectedColorDisplay(gba5, rgb8); 
-                });
-            } else {
-                // This is a placeholder
-                swatch.style.backgroundColor = 'transparent'; // Or a very light gray e.g., '#f0f0f0'
-                swatch.title = "Empty slot";
-            }
+            const colorInt = gbaHex15ToInt(colorHex15);
+            const gba5 = gbaIntToGba5(colorInt);
+            const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+            
+            swatch.style.backgroundColor = `rgb(${rgb8.r}, ${rgb8.g}, ${rgb8.b})`;
+            swatch.dataset.colorHex15 = colorHex15;
+            swatch.title = `${colorHex15} (R:${gba5.r5},G:${gba5.g5},B:${gba5.b5})`; 
+            swatch.addEventListener('click', () => { 
+                updateSelectedColorDisplay(gba5, rgb8); 
+            });
             usedColorsGrid.appendChild(swatch);
-        }
+        });
     }
-    function trackUsedColor(colorInt, isAdding) { /* ... (logic from draw/script.js, using hex strings for the Set) ... */
-        if (colorInt === null && !isAdding) return; // Cannot remove null, only add valid colors
+    function trackUsedColor(colorInt, isAdding) { 
+        if (colorInt === null && !isAdding) return; 
         const colorHex15 = gbaRgb5ToHex15(gbaIntToGba5(colorInt).r5, gbaIntToGba5(colorInt).g5, gbaIntToGba5(colorInt).b5);
         if (isAdding) { 
-            if (usedColors.size < 15 && !usedColors.has(colorHex15)) { // Enforce 15 color max for adding to set
+            if (!usedColors.has(colorHex15)) { 
                 usedColors.add(colorHex15); 
                 updateUsedColorsPaletteDisplay(); 
             }
