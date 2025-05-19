@@ -417,17 +417,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function drawPixel(cellX, cellY) {
         if (cellX < 0 || cellX >= GRID_WIDTH || cellY < 0 || cellY >= GRID_HEIGHT) return;
-        const prevColorInt = pixelGrid[cellY][cellX];
+        
+        const prevColorInt = pixelGrid[cellY][cellX]; // Capture the color before drawing
         const selectedColorInt = gbaHex15ToInt(gbaRgb5ToHex15(currentGba5Color.r5, currentGba5Color.g5, currentGba5Color.b5));
 
         if (selectedTool === 'pencil') {
-            if (pixelGrid[cellY][cellX] === selectedColorInt) return; // No change
+            if (prevColorInt === selectedColorInt) return; // No change if color is the same
+
             ctx.fillStyle = `rgb(${currentDisplayRgb8Color.r}, ${currentDisplayRgb8Color.g}, ${currentDisplayRgb8Color.b})`;
             ctx.fillRect(cellX * PIXEL_SIZE, cellY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
             pixelGrid[cellY][cellX] = selectedColorInt;
-            trackUsedColor(selectedColorInt, true);
+            trackUsedColor(selectedColorInt, true); // Track the newly added color
+
+            // Now, check if the overwritten color needs to be removed from usedColors
+            if (prevColorInt !== null && prevColorInt !== selectedColorInt) {
+                trackUsedColor(prevColorInt, false);
+            }
+
         } else if (selectedTool === 'eraser') {
-            if (prevColorInt === null) return; // No change
+            if (prevColorInt === null) return; // No change if already empty
             ctx.clearRect(cellX * PIXEL_SIZE, cellY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
             pixelGrid[cellY][cellX] = null;
             trackUsedColor(prevColorInt, false);
