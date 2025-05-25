@@ -331,10 +331,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- General Hue Palette Generation (from limited/script.js, adapted) ---
     const PALETTE_NAMES_GENERAL = [
-        "Red", "Orange", "Yellow", "Lime Green", "Green-Cyan",
+        "Red", "Orange + Skin", "Yellow", "Lime Green", "Green-Cyan",
         "Cyan", "Azure", "Blue", "Violet", "Magenta"
     ];
     const GENERAL_HUES_DEG = [0, 30, 55, 90, 135, 180, 216, 252, 288, 324];
+
+    // Define specific skin-tone colors to replace certain colors in Orange palette (hue 30°)
+    const SKIN_TONE_REPLACEMENTS_GBA5 = [
+        {r5: 30, g5: 28, b5: 25}, // R: 249, G: 229, B: 205 -> 0x679E
+        {r5: 29, g5: 22, b5: 17}, // R: 235, G: 182, B: 138 -> 0x46DD
+        {r5: 24, g5: 16, b5: 11}, // R: 201, G: 132, B: 93  -> 0x2E18
+        {r5: 20, g5: 12, b5: 9},  // R: 164, G: 98, B: 72   -> 0x2594
+        {r5: 15, g5: 8, b5: 6}    // R: 122, G: 62, B: 51   -> 0x190F
+    ];
 
     function createPaletteColorBlock(gba5Color, displayRgb8Color) {
         const block = document.createElement('div');
@@ -373,6 +382,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     paletteGrid.appendChild(createPaletteColorBlock(gba5, gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5)));
                 }
             }
+
+            // Special handling for Orange palette (palIdx === 1) - replace specific colors with skin tones
+            if (palIdx === 1) {
+                // Clear the grid and regenerate with skin-tone replacements
+                paletteGrid.innerHTML = '';
+                let colorIndex = 0;
+                const replacementPositions = [2, 7, 9, 12, 13];
+                
+                for (let vIdx = 0; vIdx < numValueSteps; vIdx++) {
+                    const val = 1.0 - (vIdx * (0.6 / (numValueSteps - 1)));
+                    for (let sIdx = 0; sIdx < numSatSteps; sIdx++) {
+                        const sat = 1.0 - (sIdx * (0.7 / (numSatSteps - 1)));
+                        let gba5;
+                        
+                        // Check if this position should be replaced with a skin tone
+                        const replacementIndex = replacementPositions.indexOf(colorIndex);
+                        if (replacementIndex !== -1 && replacementIndex < SKIN_TONE_REPLACEMENTS_GBA5.length) {
+                            gba5 = SKIN_TONE_REPLACEMENTS_GBA5[replacementIndex];
+                        } else {
+                            const targetRgb8 = hsvToRgb(hue, sat, val);
+                            gba5 = rgb8ToGbaRgb5(targetRgb8.r, targetRgb8.g, targetRgb8.b);
+                        }
+                        
+                        paletteGrid.appendChild(createPaletteColorBlock(gba5, gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5)));
+                        colorIndex++;
+                    }
+                }
+            }
+
             const grayIndex = palIdx;
             const minGrayLevel = 3; const maxGrayLevel = 31;
             let grayLevelStep = 0;

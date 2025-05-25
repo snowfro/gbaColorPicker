@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Palette 0 (Protagonist)", "Palette 1 (Rock)", "Palette 2 (Sky/Celestial)",
         "Palette 3 (Items)", "Palette 4 (Flora/Fauna)", "Palette 5 (Aux)",
         "Palette 6 (General Red)",         // Hue 0°
-        "Palette 7 (General Orange)",      // Hue 30°
+        "Palette 7 (General Orange + Skin)",      // Hue 30°
         "Palette 8 (General Yellow)",      // Hue 55°
         "Palette 9 (General Lime Green)",  // Hue 90°
         "Palette 10 (General Green-Cyan)", // Hue 135°
@@ -120,6 +120,15 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const GENERAL_HUES_DEG = [0, 30, 55, 90, 135, 180, 216, 252, 288, 324];
+
+    // Define specific skin-tone colors to replace certain colors in Palette 7 (General Orange)
+    const SKIN_TONE_REPLACEMENTS_GBA5 = [
+        {r5: 30, g5: 28, b5: 25}, // R: 249, G: 229, B: 205 -> 0x679E
+        {r5: 29, g5: 22, b5: 17}, // R: 235, G: 182, B: 138 -> 0x46DD
+        {r5: 24, g5: 16, b5: 11}, // R: 201, G: 132, B: 93  -> 0x2E18
+        {r5: 20, g5: 12, b5: 9},  // R: 164, G: 98, B: 72   -> 0x2594
+        {r5: 15, g5: 8, b5: 6}    // R: 122, G: 62, B: 51   -> 0x190F
+    ];
 
     // Store GBA 5-bit colors for all palettes for JSON export
     let allPalettesGba5 = Array(16).fill(null).map(() => Array(16).fill(null)); 
@@ -224,6 +233,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         const gba5Color = rgb8ToGbaRgb5(targetRgb8.r, targetRgb8.g, targetRgb8.b);
                         hueVariationsGba5.push(gba5Color);
                     }
+                }
+
+                // Special handling for Palette 7 (General Orange) - replace specific colors with skin tones
+                if (palIdx === 7) {
+                    // Replace colors at specific positions with skin-tone colors
+                    // Based on the image, we need to replace colors at positions: 2, 7, 9, 12, 13
+                    const replacementPositions = [2, 7, 9, 12, 13];
+                    replacementPositions.forEach((pos, idx) => {
+                        if (pos < hueVariationsGba5.length && idx < SKIN_TONE_REPLACEMENTS_GBA5.length) {
+                            hueVariationsGba5[pos] = SKIN_TONE_REPLACEMENTS_GBA5[idx];
+                        }
+                    });
                 }
 
                 hueVariationsGba5.forEach((gba5, i) => {
