@@ -9,7 +9,15 @@
 </head>
 <body>
     <h1>Self Portrait</h1>
-    <p class="description">Draw a full body portrait of yourself in pixels! Pick colors in the palettes and place them on the canvas. Keep unused pixels transparent (don't fill around your drawing) and make sure there are no transparent pixels inside your drawing unless you intend for them to show whatever is underneath. There is a full set of grayscale colors at the end of each palette (starting with white on the first palette and black on the last palette). Once you're done, make sure to name it (click the pencil icon) and then hit "Download Bitmap String" and send it to me via email or DMs.</p>
+    <p class="description">Create a pixel art self-portrait by selecting colors from the palettes and placing them on the canvas.</p>
+    <ol class="instructions">
+        <li>Draw your full-body portrait</li>
+        <li>Leave the background transparent (don't fill around your figure)</li>
+        <li>Fill all pixels within your drawing (unless transparency is intentional)</li>
+        <li>Grayscale colors are available at the end of each palette</li>
+        <li>When finished, name your creation (pencil icon) and click "Download Bitmap String"</li>
+        <li>Share via email or DM</li>
+    </ol>
 
     <div class="app-container">
         <!-- Color Selection Area - General Hue Palettes -->
@@ -58,7 +66,7 @@
         <div class="drawing-area">
             <!-- Drawing Tools - MOVED HERE -->
             <div class="drawing-tools-panel">
-                <button id="pencil-tool" class="tool-button active" title="Pencil">✏️</button>
+                <button id="pencil-tool" class="tool-button active" title="Paintbrush">🖌️</button>
                 <button id="eraser-tool" class="tool-button" title="Eraser">🧼</button>
                 <button id="undo-button" class="tool-button" title="Undo">↩️</button>
             </div>
