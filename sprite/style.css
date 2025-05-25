@@ -136,12 +136,75 @@ h1, h3 {
     position: relative;
 }
 
-/* Drawing Tools Panel - New */
+/* Drawing Tools Panel */
 .drawing-tools-panel {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 10px;
     margin-bottom: 5px;
+}
+
+/* Container for canvas and animation controls side by side */
+.canvas-and-animation-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.animation-tools-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    position: absolute;
+    right: 15px; /* Position centered in the margin space between canvas and container edge */
+    top: 50%;
+    transform: translateY(-50%); /* Center vertically */
+    width: 30px; /* Reduce width to fit better in the space */
+    justify-content: center;
+}
+
+/* Animation Separator - Horizontal line for vertical layout */
+.animation-separator {
+    width: 30px;
+    height: 2px;
+    background-color: #ccc;
+    margin: 5px 0;
+}
+
+/* Remove old tool separator styles since we're not using horizontal separators in drawing tools anymore */
+.tool-separator {
+    display: none;
+}
+
+/* Frame Controls */
+.frame-button.active {
+    background-color: #e74c3c !important;
+    color: white !important;
+    border-color: #c0392b !important;
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5) !important;
+}
+
+.frame-button.active:hover {
+    background-color: #c0392b !important;
+}
+
+/* Animation states */
+.animating #canvas-container {
+    border-color: #e74c3c;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+}
+
+.onion-skin-active #onion-skin-btn {
+    background-color: #f39c12;
+    color: white;
+    border-color: #e67e22;
+    box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+}
+
+.onion-skin-active #onion-skin-btn:hover {
+    background-color: #e67e22;
 }
 
 /* Drawing Area & Canvas - From draw/style.css */
@@ -164,13 +227,25 @@ h1, h3 {
                       linear-gradient(-45deg, transparent 75%, #ccc 75%);
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    position: relative;
+    margin-left: 60px;
+    margin-right: 60px;
 }
 
-#pixel-canvas {
+#pixel-canvas, #onion-skin-canvas {
     display: block;
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+}
+
+#onion-skin-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+    pointer-events: none;
+    display: none;
 }
 
 /* Controls Panel - From draw/style.css - Now split and repurposed */
@@ -181,8 +256,8 @@ h1, h3 {
 /* .tools, .export-buttons (original sub-classes) styling is now part of .drawing-tools-panel and .export-buttons-panel */
 
 .tool-button, .export-buttons-panel button {
-    padding: 8px 12px;
-    font-size: 1em;
+    padding: 6px 9px;
+    font-size: 0.75em;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #f9f9f9;
@@ -302,6 +377,24 @@ h1, h3 {
   .drawing-area { /* Ensure drawing area comes first on mobile */
       order: -1;
   }
+  
+  .canvas-and-animation-container {
+      flex-direction: column; /* Stack canvas and animation controls vertically on mobile */
+      gap: 15px;
+  }
+  
+  .animation-tools-panel {
+      position: static; /* Reset absolute positioning on mobile */
+      transform: none; /* Remove transform on mobile */
+      width: auto; /* Reset width on mobile */
+      flex-direction: row; /* Make animation tools horizontal on mobile */
+      flex-wrap: wrap;
+      justify-content: center;
+  }
+  
+  .animation-separator {
+      display: none; /* Hide separator on mobile since tools are horizontal */
+  }
 
   /* Adjustments for the main color palette display */
   #general-hue-palettes-display {
@@ -339,6 +432,8 @@ h1, h3 {
   #canvas-container {
     max-width: 100%;
     overflow-x: auto;
+    margin-left: 0; /* Remove left margin on mobile */
+    margin-right: 0; /* Remove right margin on mobile */
   }
   .drawing-area {
       padding: 10px; /* Ensure some padding around tools and canvas */

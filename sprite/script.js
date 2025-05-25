@@ -2,10 +2,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const canvas = document.getElementById('pixel-canvas');
     const ctx = canvas.getContext('2d');
+    const onionSkinCanvas = document.getElementById('onion-skin-canvas');
+    const onionSkinCtx = onionSkinCanvas.getContext('2d');
     const canvasContainer = document.getElementById('canvas-container');
     const pencilToolBtn = document.getElementById('pencil-tool');
     const eraserToolBtn = document.getElementById('eraser-tool');
     const undoButton = document.getElementById('undo-button');
+    const eyedropperToolBtn = document.getElementById('eyedropper-tool');
+    
+    // Animation Controls
+    const frameABtn = document.getElementById('frame-a-btn');
+    const frameBBtn = document.getElementById('frame-b-btn');
+    const copyFrameBtn = document.getElementById('copy-frame-btn');
+    const animatePreviewBtn = document.getElementById('animate-preview-btn');
+    const onionSkinBtn = document.getElementById('onion-skin-btn');
+    
     const downloadPngBtn = document.getElementById('download-png');
     const downloadBitmapBtn = document.getElementById('download-bitmap-btn');
     const uploadBitmapBtn = document.getElementById('upload-bitmap-btn');
@@ -284,17 +295,29 @@ document.addEventListener('DOMContentLoaded', () => {
         "0x2D2C",
         "0x0C63"]
 
-    // --- Drawing State (from draw/script.js) ---
+    // --- State Variables (from draw/script.js, adapted) ---
     let selectedTool = 'pencil';
     let isDrawing = false;
-    let pixelGrid; // To store GBA 15-bit color values (integers)
+    let pixelGrid;
     let usedColors = new Set(); // Stores 15-bit hex strings of used colors
     let currentGba5Color = { r5: 0, g5: 0, b5: 0 }; // Default to black
     let currentDisplayRgb8Color = {r:0, g:0, b:0};
 
-    // --- Undo History (from draw/script.js) ---
+    // Undo/Redo 
     let history = [];
     const MAX_HISTORY = 20;
+
+    // --- Animation Variables ---
+    let frameAData = null; // 2D array for frame A
+    let frameBData = null; // 2D array for frame B
+    let frameAUsedColors = new Set(); // Used colors for frame A
+    let frameBUsedColors = new Set(); // Used colors for frame B
+    let frameAHistory = []; // Undo history for frame A
+    let frameBHistory = []; // Undo history for frame B
+    let currentFrame = 'A'; // 'A' or 'B'
+    let onionSkinEnabled = false;
+    let isAnimating = false;
+    let animationInterval = null;
 
     // --- Color Conversion Functions (Shared) ---
     function hsvToRgb(h, s, v) { /* ... from limited/script.js ... */ 
@@ -432,13 +455,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Grid & Drawing Functions (from draw/script.js, adapted for fixed size) ---
     function setupPixelGridData() {
-        pixelGrid = Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(null));
-        usedColors.clear();
+        // Initialize both frames
+        frameAData = Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(null));
+        frameBData = Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(null));
+        
+        // Reset used colors for both frames
+        frameAUsedColors.clear();
+        frameBUsedColors.clear();
+        
+        // Reset histories
+        frameAHistory = [];
+        frameBHistory = [];
+        
+        // Set current frame data
+        pixelGrid = currentFrame === 'A' ? frameAData : frameBData;
+        usedColors = currentFrame === 'A' ? frameAUsedColors : frameBUsedColors;
+        history = currentFrame === 'A' ? frameAHistory : frameBHistory;
+        
         updateUsedColorsPaletteDisplay();
-        history = [];
     }
-    function saveToHistory() { /* ... from draw/script.js ... */ const gridCopy = pixelGrid.map(row => [...row]); history.push({grid: gridCopy, colors: new Set(usedColors)}); if (history.length > MAX_HISTORY) { history.shift(); } }
-    function undo() { /* ... from draw/script.js ... */ if (history.length === 0) return; const lastState = history.pop(); pixelGrid = lastState.grid; usedColors = lastState.colors; redrawAll(); updateUsedColorsPaletteDisplay(); }
+    function saveToHistory() { 
+        const gridCopy = pixelGrid.map(row => [...row]); 
+        history.push({grid: gridCopy, colors: new Set(usedColors)}); 
+        if (history.length > MAX_HISTORY) { 
+            history.shift(); 
+        } 
+        
+        // Update the current frame's data reference
+        if (currentFrame === 'A') {
+            frameAData = pixelGrid;
+            frameAUsedColors = usedColors;
+            frameAHistory = history;
+        } else {
+            frameBData = pixelGrid;
+            frameBUsedColors = usedColors;
+            frameBHistory = history;
+        }
+    }
+    function undo() { 
+        if (history.length === 0) return; 
+        const lastState = history.pop(); 
+        pixelGrid = lastState.grid; 
+        usedColors = lastState.colors; 
+        
+        // Update the current frame's data reference
+        if (currentFrame === 'A') {
+            frameAData = pixelGrid;
+            frameAUsedColors = usedColors;
+            frameAHistory = history;
+        } else {
+            frameBData = pixelGrid;
+            frameBUsedColors = usedColors;
+            frameBHistory = history;
+        }
+        
+        redrawAll(); 
+        updateUsedColorsPaletteDisplay();
+        updateOnionSkin(); // Update onion skin when undoing
+    }
     function redrawAll() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let y = 0; y < GRID_HEIGHT; y++) {
@@ -452,9 +526,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        updateOnionSkin(); // Update onion skin when redrawing
     }
     function drawPixel(cellX, cellY) {
         if (cellX < 0 || cellX >= GRID_WIDTH || cellY < 0 || cellY >= GRID_HEIGHT) return;
+        
+        // Handle eyedropper tool
+        if (selectedTool === 'eyedropper') {
+            const colorInt = pixelGrid[cellY][cellX];
+            if (colorInt !== null) {
+                const gba5 = gbaIntToGba5(colorInt);
+                const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+                updateSelectedColorDisplay(gba5, rgb8);
+                // Switch back to pencil tool after sampling
+                setActiveTool('pencil');
+            }
+            return;
+        }
         
         const prevColorInt = pixelGrid[cellY][cellX]; // Capture the color before drawing
         const selectedColorInt = gbaHex15ToInt(gbaRgb5ToHex15(currentGba5Color.r5, currentGba5Color.g5, currentGba5Color.b5));
@@ -478,6 +566,9 @@ document.addEventListener('DOMContentLoaded', () => {
             pixelGrid[cellY][cellX] = null;
             trackUsedColor(prevColorInt, false);
         }
+        
+        // Update onion skin after drawing/erasing
+        updateOnionSkin();
     }
     function getCoords(e) { /* ... from draw/script.js ... */ const rect = canvas.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top; return { cellX: Math.floor(x / PIXEL_SIZE), cellY: Math.floor(y / PIXEL_SIZE) }; }
 
@@ -545,48 +636,89 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // New function to download bitmap string
     function downloadBitmapString() {
-        let filename = (artworkTitleElement.childNodes[0].nodeValue.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'sprite_bitmap') + '.txt';
-        let bitmapString = "";
-
         if (typeof GBA_FULL_PALETTE_ARRAY === 'undefined' || !Array.isArray(GBA_FULL_PALETTE_ARRAY)) {
             console.error("GBA_FULL_PALETTE_ARRAY is not defined or not an array.");
             alert("Error: Palette data is missing. Cannot generate bitmap string.");
             return;
         }
 
-        for (let y = 0; y < GRID_HEIGHT; y++) {
-            for (let x = 0; x < GRID_WIDTH; x++) {
-                const colorInt = pixelGrid[y][x];
-                if (colorInt === null) {
-                    bitmapString += "00";
-                } else {
-                    const gba5 = gbaIntToGba5(colorInt);
-                    const gbaHexColorString = gbaRgb5ToHex15(gba5.r5, gba5.g5, gba5.b5);
-                    
-                    // --- DOWNLOAD DEBUG LOGIC --- 
-                    let determinedPaletteIndex = -1;
-                    let foundViaIteration = false;
-
-                    // Iterative check for the 96-255 range first (most robust)
-                    for (let i = 96; i <= 255; i++) {
-                        if (GBA_FULL_PALETTE_ARRAY[i] === gbaHexColorString) {
-                            determinedPaletteIndex = i;
-                            foundViaIteration = true;
-                            break;
-                        }
-                    }
-                    // ---- END DOWNLOAD DEBUG LOGIC ----
-
-                    if (determinedPaletteIndex !== -1) { // Relies on the iterative search success
-                        bitmapString += determinedPaletteIndex.toString(16).padStart(2, '0').toUpperCase();
-                    } else {
-                        // This means the color on canvas was not one of the 160 general palette colors (indices 96-255)
-                        console.warn(`DOWNLOAD: Color ${gbaHexColorString} at (x:${x},y:${y}) was not found in GBA_FULL_PALETTE_ARRAY[96-255]. Writing '00'.`);
-                        bitmapString += "00"; 
+        // Helper function to check if a frame has any non-null pixels
+        function frameHasData(frameData) {
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    if (frameData[y][x] !== null) {
+                        return true;
                     }
                 }
             }
+            return false;
         }
+
+        // Helper function to generate bitmap string for a frame
+        function generateFrameBitmapString(frameData) {
+            let frameString = "";
+            
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    const colorInt = frameData[y][x];
+                    if (colorInt === null) {
+                        frameString += "00";
+                    } else {
+                        const gba5 = gbaIntToGba5(colorInt);
+                        const gbaHexColorString = gbaRgb5ToHex15(gba5.r5, gba5.g5, gba5.b5);
+                        
+                        let determinedPaletteIndex = -1;
+                        
+                        // Iterative check for the 96-255 range
+                        for (let i = 96; i <= 255; i++) {
+                            if (GBA_FULL_PALETTE_ARRAY[i] === gbaHexColorString) {
+                                determinedPaletteIndex = i;
+                                break;
+                            }
+                        }
+
+                        if (determinedPaletteIndex !== -1) {
+                            frameString += determinedPaletteIndex.toString(16).padStart(2, '0').toUpperCase();
+                        } else {
+                            console.warn(`DOWNLOAD: Color ${gbaHexColorString} at (x:${x},y:${y}) was not found in GBA_FULL_PALETTE_ARRAY[96-255]. Writing '00'.`);
+                            frameString += "00"; 
+                        }
+                    }
+                }
+            }
+            
+            return frameString;
+        }
+
+        // Check which frames have data
+        const frameAHasData = frameHasData(frameAData);
+        const frameBHasData = frameHasData(frameBData);
+        
+        let bitmapString = "";
+        let isDoubleFrame = false;
+        let baseFilename = artworkTitleElement.childNodes[0].nodeValue.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'sprite_bitmap';
+        
+        if (frameAHasData && frameBHasData) {
+            // Both frames have data - export as 2048 character string
+            isDoubleFrame = true;
+            bitmapString = generateFrameBitmapString(frameAData) + generateFrameBitmapString(frameBData);
+            alert("Exporting two-frame animation (2048 characters)");
+        } else if (frameAHasData) {
+            // Only Frame A has data - export just Frame A
+            bitmapString = generateFrameBitmapString(frameAData);
+            alert("Exporting single frame A (1024 characters)");
+        } else if (frameBHasData) {
+            // Only Frame B has data - export just Frame B
+            bitmapString = generateFrameBitmapString(frameBData);
+            alert("Exporting single frame B (1024 characters)");
+        } else {
+            // No data in either frame
+            alert("No pixel data to export. Please draw something first!");
+            return;
+        }
+        
+        // Create filename indicating single or double frame
+        let filename = baseFilename + (isDoubleFrame ? '_animation' : '_single') + '.txt';
 
         const blob = new Blob([bitmapString], {type: 'text/plain'});
         const url = URL.createObjectURL(blob);
@@ -614,11 +746,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const expectedLength = GRID_WIDTH * GRID_HEIGHT * 2; // 16*32*2 = 1024
+            const singleFrameLength = GRID_WIDTH * GRID_HEIGHT * 2; // 16*32*2 = 1024
+            const twoFrameLength = singleFrameLength * 2; // 1024 * 2 = 2048
             const sanitizedContent = content.replace(/\s+/g, ''); // Remove any whitespace
 
-            if (sanitizedContent.length !== expectedLength) {
-                alert(`Error: Bitmap string has incorrect length. Expected ${expectedLength} characters, got ${sanitizedContent.length}.`);
+            // Check if it's single frame or two frame
+            let isDoubleFrame = false;
+            if (sanitizedContent.length === singleFrameLength) {
+                isDoubleFrame = false;
+            } else if (sanitizedContent.length === twoFrameLength) {
+                isDoubleFrame = true;
+            } else {
+                alert(`Error: Bitmap string has incorrect length. Expected ${singleFrameLength} characters (single frame) or ${twoFrameLength} characters (two frames), got ${sanitizedContent.length}.`);
                 return;
             }
 
@@ -628,36 +767,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Clear existing grid and history
-            setupPixelGridData(); // This clears pixelGrid, usedColors, and updates display
-            history = []; // Clear undo history explicitly
-
-            let currentPosition = 0;
-            for (let y = 0; y < GRID_HEIGHT; y++) {
-                for (let x = 0; x < GRID_WIDTH; x++) {
-                    const byteHex = sanitizedContent.substring(currentPosition, currentPosition + 2).toUpperCase();
-                    currentPosition += 2;
-                    const paletteIndex = parseInt(byteHex, 16);
-                    
-                    if (byteHex === "00") {
-                        pixelGrid[y][x] = null;
-                    } else if (paletteIndex >= 96 && paletteIndex <= 255) {
-                        if (GBA_FULL_PALETTE_ARRAY && GBA_FULL_PALETTE_ARRAY[paletteIndex]) {
-                            const gbaHexColorString = GBA_FULL_PALETTE_ARRAY[paletteIndex];
-                            const colorInt = gbaHex15ToInt(gbaHexColorString);
-                            pixelGrid[y][x] = colorInt;
-                            trackUsedColor(colorInt, true); 
-                        } else {
-                            console.warn(`Invalid palette index ${paletteIndex} (hex: ${byteHex}) at (x:${x}, y:${y}) or GBA_FULL_PALETTE_ARRAY missing. Using transparent.`);
-                            pixelGrid[y][x] = null;
-                        }
-                    } else {
-                        console.warn(`Invalid byte value "${byteHex}" (index ${paletteIndex}) in bitmap string at (x:${x}, y:${y}). Expected 00 or index 96-255. Using transparent.`);
-                        pixelGrid[y][x] = null;
-                    }
-                }
+            setupPixelGridData(); // This clears both frames, usedColors, and updates display
+            
+            // Load Frame A (always present)
+            loadFrameFromString(sanitizedContent.substring(0, singleFrameLength), 'A');
+            
+            // Load Frame B if it's a two-frame sprite
+            if (isDoubleFrame) {
+                loadFrameFromString(sanitizedContent.substring(singleFrameLength), 'B');
+                alert("Loaded two-frame sprite successfully!");
+            } else {
+                alert("Loaded single-frame sprite into Frame A successfully!");
             }
+            
+            // Ensure we're viewing Frame A after loading
+            switchToFrame('A');
             redrawAll();
-            updateUsedColorsPaletteDisplay(); // Ensure used colors palette is updated after loading
+            updateUsedColorsPaletteDisplay();
+            updateOnionSkin();
         };
 
         reader.onerror = () => {
@@ -667,12 +794,69 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
         event.target.value = null; // Reset file input to allow re-uploading the same file
     }
+    
+    // Helper function to load a frame from a bitmap string
+    function loadFrameFromString(frameString, frameId) {
+        const targetGrid = frameId === 'A' ? frameAData : frameBData;
+        const targetColors = frameId === 'A' ? frameAUsedColors : frameBUsedColors;
+        
+        // Clear the target frame
+        for (let y = 0; y < GRID_HEIGHT; y++) {
+            for (let x = 0; x < GRID_WIDTH; x++) {
+                targetGrid[y][x] = null;
+            }
+        }
+        targetColors.clear();
+        
+        let currentPosition = 0;
+        for (let y = 0; y < GRID_HEIGHT; y++) {
+            for (let x = 0; x < GRID_WIDTH; x++) {
+                const byteHex = frameString.substring(currentPosition, currentPosition + 2).toUpperCase();
+                currentPosition += 2;
+                const paletteIndex = parseInt(byteHex, 16);
+                
+                if (byteHex === "00") {
+                    targetGrid[y][x] = null;
+                } else if (paletteIndex >= 96 && paletteIndex <= 255) {
+                    if (GBA_FULL_PALETTE_ARRAY && GBA_FULL_PALETTE_ARRAY[paletteIndex]) {
+                        const gbaHexColorString = GBA_FULL_PALETTE_ARRAY[paletteIndex];
+                        const colorInt = gbaHex15ToInt(gbaHexColorString);
+                        targetGrid[y][x] = colorInt;
+                        
+                        // Track used colors for this frame
+                        const colorHex15 = gbaRgb5ToHex15(gbaIntToGba5(colorInt).r5, gbaIntToGba5(colorInt).g5, gbaIntToGba5(colorInt).b5);
+                        targetColors.add(colorHex15);
+                    } else {
+                        console.warn(`Invalid palette index ${paletteIndex} (hex: ${byteHex}) at (x:${x}, y:${y}) or GBA_FULL_PALETTE_ARRAY missing. Using transparent.`);
+                        targetGrid[y][x] = null;
+                    }
+                } else {
+                    console.warn(`Invalid byte value "${byteHex}" (index ${paletteIndex}) in bitmap string at (x:${x}, y:${y}). Expected 00 or index 96-255. Using transparent.`);
+                    targetGrid[y][x] = null;
+                }
+            }
+        }
+    }
 
     // --- Tool Selection & Event Listeners (from draw/script.js) ---
-    function setActiveTool(tool) { selectedTool = tool; pencilToolBtn.classList.toggle('active', tool === 'pencil'); eraserToolBtn.classList.toggle('active', tool === 'eraser'); }
+    function setActiveTool(tool) { 
+        selectedTool = tool; 
+        pencilToolBtn.classList.toggle('active', tool === 'pencil'); 
+        eraserToolBtn.classList.toggle('active', tool === 'eraser'); 
+        eyedropperToolBtn.classList.toggle('active', tool === 'eyedropper');
+    }
+    eyedropperToolBtn.addEventListener('click', () => setActiveTool('eyedropper'));
     pencilToolBtn.addEventListener('click', () => setActiveTool('pencil'));
     eraserToolBtn.addEventListener('click', () => setActiveTool('eraser'));
     undoButton.addEventListener('click', undo);
+    
+    // Animation control event listeners
+    frameABtn.addEventListener('click', () => switchToFrame('A'));
+    frameBBtn.addEventListener('click', () => switchToFrame('B'));
+    copyFrameBtn.addEventListener('click', copyOtherFrameToCurrent);
+    animatePreviewBtn.addEventListener('click', startAnimationPreview);
+    onionSkinBtn.addEventListener('click', toggleOnionSkin);
+    
     downloadPngBtn.addEventListener('click', downloadCanvasAsPNG);
     downloadBitmapBtn.addEventListener('click', downloadBitmapString);
     uploadBitmapBtn.addEventListener('click', () => {
@@ -692,12 +876,169 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('touchcancel', (e) => { e.preventDefault(); if(isDrawing) isDrawing = false; });
     if (artworkTitleElement) { artworkTitleElement.addEventListener('click', function(e) { if (e.target === this || e.target.classList.contains('edit-icon')) { const currentTitle = this.childNodes[0].nodeValue.trim(); const newTitle = prompt("Sprite Name:", currentTitle); if (newTitle !== null && newTitle.trim() !== "") { this.childNodes[0].nodeValue = newTitle.trim() + " ";}}});}
 
+    // --- Animation Functions ---
+    function switchToFrame(frameId) {
+        if (currentFrame === frameId) return;
+        
+        // Save current frame state
+        if (currentFrame === 'A') {
+            frameAData = pixelGrid;
+            frameAUsedColors = usedColors;
+            frameAHistory = history;
+        } else {
+            frameBData = pixelGrid;
+            frameBUsedColors = usedColors;
+            frameBHistory = history;
+        }
+        
+        // Switch to new frame
+        currentFrame = frameId;
+        pixelGrid = currentFrame === 'A' ? frameAData : frameBData;
+        usedColors = currentFrame === 'A' ? frameAUsedColors : frameBUsedColors;
+        history = currentFrame === 'A' ? frameAHistory : frameBHistory;
+        
+        // Update UI
+        frameABtn.classList.toggle('active', currentFrame === 'A');
+        frameBBtn.classList.toggle('active', currentFrame === 'B');
+        
+        // Redraw canvas and update displays
+        redrawAll();
+        updateUsedColorsPaletteDisplay();
+        updateOnionSkin();
+    }
+    
+    function updateOnionSkin() {
+        if (!onionSkinEnabled) {
+            onionSkinCanvas.style.display = 'none';
+            return;
+        }
+        
+        onionSkinCanvas.style.display = 'block';
+        onionSkinCtx.clearRect(0, 0, onionSkinCanvas.width, onionSkinCanvas.height);
+        
+        // Get the other frame's data
+        const otherFrameData = currentFrame === 'A' ? frameBData : frameAData;
+        
+        // Draw the other frame with transparency
+        for (let y = 0; y < GRID_HEIGHT; y++) {
+            for (let x = 0; x < GRID_WIDTH; x++) {
+                const colorInt = otherFrameData[y][x];
+                if (colorInt !== null) {
+                    const gba5 = gbaIntToGba5(colorInt);
+                    const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+                    onionSkinCtx.fillStyle = `rgba(${rgb8.r}, ${rgb8.g}, ${rgb8.b}, 0.5)`;
+                    onionSkinCtx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+                }
+            }
+        }
+    }
+    
+    function toggleOnionSkin() {
+        onionSkinEnabled = !onionSkinEnabled;
+        document.body.classList.toggle('onion-skin-active', onionSkinEnabled);
+        updateOnionSkin();
+    }
+    
+    function startAnimationPreview() {
+        if (isAnimating) {
+            stopAnimationPreview();
+            return;
+        }
+        
+        isAnimating = true;
+        document.body.classList.add('animating');
+        animatePreviewBtn.textContent = '⏹️';
+        animatePreviewBtn.title = 'Stop Animation';
+        
+        let showingA = true;
+        animationInterval = setInterval(() => {
+            if (showingA) {
+                // Show frame A
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawFrame(frameAData);
+            } else {
+                // Show frame B
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawFrame(frameBData);
+            }
+            showingA = !showingA;
+        }, 500); // 500ms interval for animation
+    }
+    
+    function stopAnimationPreview() {
+        if (!isAnimating) return;
+        
+        isAnimating = false;
+        document.body.classList.remove('animating');
+        animatePreviewBtn.textContent = '🎬';
+        animatePreviewBtn.title = 'Preview Animation';
+        
+        if (animationInterval) {
+            clearInterval(animationInterval);
+            animationInterval = null;
+        }
+        
+        // Redraw current frame
+        redrawAll();
+    }
+    
+    function drawFrame(frameData) {
+        for (let y = 0; y < GRID_HEIGHT; y++) {
+            for (let x = 0; x < GRID_WIDTH; x++) {
+                const colorInt = frameData[y][x];
+                if (colorInt !== null) {
+                    const gba5 = gbaIntToGba5(colorInt);
+                    const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+                    ctx.fillStyle = `rgb(${rgb8.r}, ${rgb8.g}, ${rgb8.b})`;
+                    ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+                }
+            }
+        }
+    }
+    
+    function copyOtherFrameToCurrent() {
+        const otherFrame = currentFrame === 'A' ? 'B' : 'A';
+        const otherFrameData = currentFrame === 'A' ? frameBData : frameAData;
+        const otherFrameColors = currentFrame === 'A' ? frameBUsedColors : frameAUsedColors;
+        
+        // Show confirmation dialog
+        const confirmed = confirm(`This will copy Frame ${otherFrame} to Frame ${currentFrame}, overwriting the current frame. Are you sure?`);
+        if (!confirmed) return;
+        
+        // Save current state to history before copying
+        saveToHistory();
+        
+        // Copy the other frame's data
+        pixelGrid = otherFrameData.map(row => [...row]);
+        usedColors = new Set(otherFrameColors);
+        
+        // Update the current frame's data references
+        if (currentFrame === 'A') {
+            frameAData = pixelGrid;
+            frameAUsedColors = usedColors;
+        } else {
+            frameBData = pixelGrid;
+            frameBUsedColors = usedColors;
+        }
+        
+        // Redraw and update displays
+        redrawAll();
+        updateUsedColorsPaletteDisplay();
+        updateOnionSkin();
+    }
 
     // --- Initialization ---
     function init() {
+        // Setup main canvas
         canvas.width = GRID_WIDTH * PIXEL_SIZE;
         canvas.height = GRID_HEIGHT * PIXEL_SIZE;
         ctx.imageSmoothingEnabled = false;
+        
+        // Setup onion skin canvas
+        onionSkinCanvas.width = GRID_WIDTH * PIXEL_SIZE;
+        onionSkinCanvas.height = GRID_HEIGHT * PIXEL_SIZE;
+        onionSkinCtx.imageSmoothingEnabled = false;
+        
         canvasContainer.style.backgroundSize = `${PIXEL_SIZE*2}px ${PIXEL_SIZE*2}px`;
         const offset = PIXEL_SIZE / 2;
         canvasContainer.style.backgroundPosition = `0 0, 0 ${offset}px, ${offset}px ${-offset}px, ${-offset}px 0px`;
@@ -706,7 +1047,8 @@ document.addEventListener('DOMContentLoaded', () => {
         generateGeneralHuePalettes(); // Generate and display the fixed palettes
         setActiveTool('pencil');
         redrawAll(); 
-        console.log('GBA Self-Sprite Editor Initialized.');
+        updateOnionSkin(); // Initialize onion skin
+        console.log('GBA Self-Sprite Editor with Animation Initialized.');
     }
 
     init();

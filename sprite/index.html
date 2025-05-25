@@ -48,30 +48,34 @@
             <div class="export-buttons-panel">
                 <button id="download-png">Download PNG</button>
                 <button id="download-bitmap-btn">Download Bitmap String</button> 
-                <button id="upload-bitmap-btn">Upload Bitmap String</button>
+                <button id="upload-bitmap-btn">Load Bitmap String</button>
             </div>
             <input type="file" id="bitmap-file-input" accept=".txt" style="display: none;">
         </div>
 
-        <!-- Drawing Tools - New Location -->
-        <!-- MOVED INSIDE drawing-area 
-        <div class="drawing-tools-panel">
-            <button id="pencil-tool" class="tool-button active" title="Pencil">✏️</button>
-            <button id="eraser-tool" class="tool-button" title="Eraser">🧼</button>
-            <button id="undo-button" class="tool-button" title="Undo">↩️</button>
-        </div>
-        -->
-        
         <!-- Drawing Area -->
         <div class="drawing-area">
-            <!-- Drawing Tools - MOVED HERE -->
+            <!-- Drawing Tools - Above Canvas -->
             <div class="drawing-tools-panel">
+                <button id="eyedropper-tool" class="tool-button" title="Eyedropper (Pick Color)">💧</button>
                 <button id="pencil-tool" class="tool-button active" title="Paintbrush">🖌️</button>
                 <button id="eraser-tool" class="tool-button" title="Eraser">🧼</button>
                 <button id="undo-button" class="tool-button" title="Undo">↩️</button>
             </div>
-            <div id="canvas-container">
-                <canvas id="pixel-canvas"></canvas> 
+            <div class="canvas-and-animation-container">
+                <div id="canvas-container">
+                    <canvas id="pixel-canvas"></canvas>
+                    <canvas id="onion-skin-canvas"></canvas>
+                </div>
+                <!-- Animation Controls - Right Side -->
+                <div class="animation-tools-panel">
+                    <button id="frame-a-btn" class="tool-button frame-button active" title="Frame A">A</button>
+                    <button id="frame-b-btn" class="tool-button frame-button" title="Frame B">B</button>
+                    <div class="animation-separator"></div>
+                    <button id="copy-frame-btn" class="tool-button" title="Copy Other Frame to Current">📋</button>
+                    <button id="animate-preview-btn" class="tool-button" title="Preview Animation">🎬</button>
+                    <button id="onion-skin-btn" class="tool-button" title="Onion Skin Overlay">🧅</button>
+                </div>
             </div>
         </div>
     </div>
