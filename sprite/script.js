@@ -38,262 +38,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const GRID_HEIGHT = 32;
     const PIXEL_SIZE = 20; // Display size of each pixel on canvas
 
-    const GBA_FULL_PALETTE_ARRAY = [ "0x0000",
-        "0x533F",
-        "0x4ADE",
-        "0x3E9C",
-        "0x0CCA",
-        "0x6545",
-        "0x6318",
-        "0x3CA3",
-        "0x154F",
-        "0x14BC",
-        "0x2B9F",
-        "0x4A52",
-        "0x294A",
-        "0x5B5C",
-        "0x29F4",
-        "0x0421",
-        "0x0000",
-        "0x7FFF",
-        "0x6B5A",
-        "0x5294",
-        "0x39CE",
-        "0x2108",
-        "0x0C63",
-        "0x29D2",
-        "0x2150",
-        "0x49CC",
-        "0x21E8",
-        "0x7F34",
-        "0x16DC",
-        "0x20C6",
-        "0x6B9C",
-        "0x0421",
-        "0x0000",
-        "0x53FF",
-        "0x03FF",
-        "0x029F",
-        "0x015F",
-        "0x001F",
-        "0x0014",
-        "0x7F34",
-        "0x7DEA",
-        "0x50A5",
-        "0x7FFF",
-        "0x6B5A",
-        "0x56B5",
-        "0x3DEF",
-        "0x2108",
-        "0x0000",
-        "0x0000",
-        "0x7FFF",
-        "0x5AD6",
-        "0x3DEF",
-        "0x18C6",
-        "0x001F",
-        "0x03E0",
-        "0x7C00",
-        "0x03FF",
-        "0x42DC",
-        "0x1550",
-        "0x2A16",
-        "0x01FF",
-        "0x7C14",
-        "0x7FE0",
-        "0x0421",
-        "0x0000",
-        "0x1725",
-        "0x228A",
-        "0x0DE3",
-        "0x164F",
-        "0x154F",
-        "0x0CCA",
-        "0x0466",
-        "0x211E",
-        "0x2B9F",
-        "0x79EA",
-        "0x21D4",
-        "0x5252",
-        "0x3F8F",
-        "0x0942",
-        "0x0421",
-        "0x0000",
-        "0x001F",
-        "0x01FF",
-        "0x03FF",
-        "0x03EF",
-        "0x03E0",
-        "0x3FE0",
-        "0x7FE0",
-        "0x7DE0",
-        "0x7C00",
-        "0x7C0F",
-        "0x7C1F",
-        "0x65FF",
-        "0x7FFF",
-        "0x5AD6",
-        "0x2108",
-        "0x001F",
-        "0x2D7F",
-        "0x5ADF",
-        "0x001A",
-        "0x253A",
-        "0x4A5A",
-        "0x0016",
-        "0x2116",
-        "0x3DF6",
-        "0x0011",
-        "0x18D1",
-        "0x3191",
-        "0x000C",
-        "0x108C",
-        "0x252C",
-        "0x7FFF",
-        "0x021F",
-        "0x2EBF",
-        "0x5B5F",
-        "0x01BA",
-        "0x265A",
-        "0x4ADA",
-        "0x0176",
-        "0x21F6",
-        "0x3E56",
-        "0x0131",
-        "0x1991",
-        "0x31D1",
-        "0x00CC",
-        "0x110C",
-        "0x256C",
-        "0x739C",
-        "0x039F",
-        "0x2FBF",
-        "0x5BDF",
-        "0x031A",
-        "0x273A",
-        "0x4B5A",
-        "0x0296",
-        "0x22B6",
-        "0x3EB6",
-        "0x0211",
-        "0x1A11",
-        "0x3231",
-        "0x016C",
-        "0x118C",
-        "0x258C",
-        "0x6739",
-        "0x03F0",
-        "0x2FF5",
-        "0x5BFA",
-        "0x034D",
-        "0x2752",
-        "0x4B56",
-        "0x02CB",
-        "0x22CF",
-        "0x3ED2",
-        "0x0229",
-        "0x1A2C",
-        "0x322E",
-        "0x0186",
-        "0x1188",
-        "0x258B",
-        "0x5AD6",
-        "0x23E0",
-        "0x43EB",
-        "0x63F6",
-        "0x1F40",
-        "0x3749",
-        "0x5352",
-        "0x16C0",
-        "0x2EC8",
-        "0x46CF",
-        "0x1220",
-        "0x2626",
-        "0x362C",
-        "0x0D80",
-        "0x1984",
-        "0x2989",
-        "0x4E73",
-        "0x7FE0",
-        "0x7FEB",
-        "0x7FF6",
-        "0x6B40",
-        "0x6B49",
-        "0x6B52",
-        "0x5AC0",
-        "0x5AC8",
-        "0x5ACF",
-        "0x4620",
-        "0x4626",
-        "0x462C",
-        "0x3180",
-        "0x3184",
-        "0x3189",
-        "0x3DEF",
-        "0x7D80",
-        "0x7E6B",
-        "0x7F36",
-        "0x6960",
-        "0x6A09",
-        "0x6AD2",
-        "0x5920",
-        "0x59A8",
-        "0x5A4F",
-        "0x44E0",
-        "0x4546",
-        "0x45CC",
-        "0x30A0",
-        "0x3104",
-        "0x3149",
-        "0x318C",
-        "0x7C06",
-        "0x7D6F",
-        "0x7ED8",
-        "0x6805",
-        "0x692D",
-        "0x6A54",
-        "0x5804",
-        "0x590A",
-        "0x59F1",
-        "0x4403",
-        "0x44C8",
-        "0x458D",
-        "0x3002",
-        "0x3086",
-        "0x3129",
-        "0x2529",
-        "0x7C19",
-        "0x7D7B",
-        "0x7EDD",
-        "0x6815",
-        "0x6937",
-        "0x6A59",
-        "0x5811",
-        "0x5913",
-        "0x59F4",
-        "0x440E",
-        "0x44CF",
-        "0x4590",
-        "0x300A",
-        "0x308B",
-        "0x312C",
-        "0x18C6",
-        "0x4C1F",
-        "0x5D7F",
-        "0x6EDF",
-        "0x401A",
-        "0x4D3A",
-        "0x5E5A",
-        "0x3416",
-        "0x4116",
-        "0x4DF6",
-        "0x2811",
-        "0x34D1",
-        "0x3D91",
-        "0x1C0C",
-        "0x248C",
-        "0x2D2C",
-        "0x0C63"]
+    // Fallback hardcoded array (used only if JSON loading fails)
+  
+
+    // Global palette array - will be loaded from JSON
+    let GBA_FULL_PALETTE_ARRAY = null;
+
+    // --- JSON Palette Loading ---
+    async function loadPaletteFromJSON() {
+        try {
+            const response = await fetch('gba_full_palette_set_final.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            GBA_FULL_PALETTE_ARRAY = await response.json();
+            console.log(`✅ Loaded ${GBA_FULL_PALETTE_ARRAY.length} colors from JSON`);
+            return true;
+        } catch (error) {
+            console.error('❌ Failed to load palette JSON:', error);
+            console.error('❌ No fallback palette available - sprite tool may not work properly');
+            alert('Failed to load color palette! Please ensure gba_full_palette_set_final.json is in the sprite directory.');
+            return false;
+        }
+    }
 
     // --- State Variables (from draw/script.js, adapted) ---
     let selectedTool = 'pencil';
@@ -352,29 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
         valueRgb8bitSpan.textContent = `(RGB: ${displayRgb8Color.r}, ${displayRgb8Color.g}, ${displayRgb8Color.b})`;
     }
 
-    // --- General Hue Palette Generation (from limited/script.js, adapted) ---
-    const PALETTE_NAMES_GENERAL = [
-        "Red", "Orange + Skin", "Yellow", "Lime Green", "Green-Cyan",
-        "Cyan", "Azure", "Blue", "Violet", "Magenta"
-    ];
-    const GENERAL_HUES_DEG = [0, 30, 55, 90, 135, 180, 216, 252, 288, 324];
-
-    // Define specific skin-tone colors to replace certain colors in Orange palette (hue 30°)
-    const SKIN_TONE_REPLACEMENTS_GBA5 = [
-        {r5: 30, g5: 28, b5: 25}, // R: 249, G: 229, B: 205 -> 0x679E
-        {r5: 29, g5: 22, b5: 17}, // R: 235, G: 182, B: 138 -> 0x46DD
-        {r5: 24, g5: 16, b5: 11}, // R: 201, G: 132, B: 93  -> 0x2E18
-        {r5: 20, g5: 12, b5: 9},  // R: 164, G: 98, B: 72   -> 0x2594
-        {r5: 15, g5: 8, b5: 6}    // R: 122, G: 62, B: 51   -> 0x190F
-    ];
-
-    // Define new hair colors for palette updates
-    const NEW_HAIR_COLORS_GBA5 = {
-        burgundy: {r5: 23, g5: 7, b5: 3},    // R: 190, G: 55, B: 25 -> 0x0CF7
-        darkBrown: {r5: 10, g5: 7, b5: 4},   // R: 84, G: 58, B: 35 -> 0x10EA
-        beige: {r5: 29, g5: 29, b5: 21},     // R: 240, G: 236, B: 173 -> 0x57BD
-        white: {r5: 31, g5: 31, b5: 31}      // R: 255, G: 255, B: 255 -> 0x7FFF
-    };
+    // --- Palette Generation (now uses JSON directly) ---
+    // Note: All palette colors are now loaded from JSON file
+    // No more algorithmic generation or special replacements needed
 
     function createPaletteColorBlock(gba5Color, displayRgb8Color) {
         const block = document.createElement('div');
@@ -389,133 +136,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generateGeneralHuePalettes() {
         if (!generalHuePalettesDisplay) return;
+        if (!GBA_FULL_PALETTE_ARRAY) {
+            console.error('❌ Cannot generate palettes - JSON not loaded yet');
+            return;
+        }
+        
         generalHuePalettesDisplay.innerHTML = '';
 
-        for (let palIdx = 0; palIdx < GENERAL_HUES_DEG.length; palIdx++) {
-            const hue = GENERAL_HUES_DEG[palIdx];
+        // Generate only palettes 6-15 (indices 96-255) - these are available for sprite drawing
+        for (let paletteIdx = 6; paletteIdx < 16; paletteIdx++) {
             const paletteGroup = document.createElement('div');
             paletteGroup.classList.add('palette-group');
+            
             const titleDiv = document.createElement('div');
             titleDiv.classList.add('palette-title');
-            titleDiv.textContent = PALETTE_NAMES_GENERAL[palIdx] || `Hue ${Math.round(hue)}°`;
+            
+            // Use descriptive names for palettes 6-15
+            const paletteNames = [
+                "Red", "Orange + Skin", "Yellow", "Lime Green", "Green-Cyan",
+                "Cyan", "Azure", "Blue", "Violet", "Magenta",
+                "Palette 10", "Palette 11", "Palette 12", "Palette 13", "Palette 14", "Palette 15"
+            ];
+            titleDiv.textContent = paletteNames[paletteIdx];
             paletteGroup.appendChild(titleDiv);
+            
             const paletteGrid = document.createElement('div');
             paletteGrid.classList.add('palette-grid');
 
-            const numValueSteps = 5;
-            const numSatSteps = 3;
-            for (let vIdx = 0; vIdx < numValueSteps; vIdx++) {
-                const val = 1.0 - (vIdx * (0.6 / (numValueSteps - 1)));
-                for (let sIdx = 0; sIdx < numSatSteps; sIdx++) {
-                    const sat = 1.0 - (sIdx * (0.7 / (numSatSteps - 1)));
-                    const targetRgb8 = hsvToRgb(hue, sat, val);
-                    const gba5 = rgb8ToGbaRgb5(targetRgb8.r, targetRgb8.g, targetRgb8.b);
-                    paletteGrid.appendChild(createPaletteColorBlock(gba5, gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5)));
-                }
-            }
-
-            // Special handling for Orange palette (palIdx === 1) - replace specific colors with skin tones
-            if (palIdx === 1) {
-                // Clear the grid and regenerate with skin-tone replacements
-                paletteGrid.innerHTML = '';
-                let colorIndex = 0;
-                const replacementPositions = [2, 7, 9, 12, 13];
+            // Add 16 colors from this palette (indices paletteIdx*16 to paletteIdx*16+15)
+            for (let colorIdx = 0; colorIdx < 16; colorIdx++) {
+                const globalIndex = paletteIdx * 16 + colorIdx;
                 
-                for (let vIdx = 0; vIdx < numValueSteps; vIdx++) {
-                    const val = 1.0 - (vIdx * (0.6 / (numValueSteps - 1)));
-                    for (let sIdx = 0; sIdx < numSatSteps; sIdx++) {
-                        const sat = 1.0 - (sIdx * (0.7 / (numSatSteps - 1)));
-                        let gba5;
-                        
-                        // Check if this position should be replaced with a skin tone
-                        const replacementIndex = replacementPositions.indexOf(colorIndex);
-                        if (replacementIndex !== -1 && replacementIndex < SKIN_TONE_REPLACEMENTS_GBA5.length) {
-                            gba5 = SKIN_TONE_REPLACEMENTS_GBA5[replacementIndex];
-                        } else {
-                            const targetRgb8 = hsvToRgb(hue, sat, val);
-                            gba5 = rgb8ToGbaRgb5(targetRgb8.r, targetRgb8.g, targetRgb8.b);
-                        }
-                        
-                        paletteGrid.appendChild(createPaletteColorBlock(gba5, gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5)));
-                        colorIndex++;
-                    }
+                if (globalIndex < GBA_FULL_PALETTE_ARRAY.length) {
+                    const hexColor = GBA_FULL_PALETTE_ARRAY[globalIndex];
+                    const colorInt = gbaHex15ToInt(hexColor);
+                    const gba5 = gbaIntToGba5(colorInt);
+                    const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+                    
+                    const colorBlock = createPaletteColorBlock(gba5, rgb8);
+                    colorBlock.title = `Index ${globalIndex}: ${hexColor} (R:${gba5.r5}, G:${gba5.g5}, B:${gba5.b5})`;
+                    paletteGrid.appendChild(colorBlock);
                 }
             }
-
-            // Special handling for Yellow palette (palIdx === 2) - replace position 2 with beige
-            if (palIdx === 2) {
-                // Clear the grid and regenerate with beige replacement
-                paletteGrid.innerHTML = '';
-                let colorIndex = 0;
-                
-                for (let vIdx = 0; vIdx < numValueSteps; vIdx++) {
-                    const val = 1.0 - (vIdx * (0.6 / (numValueSteps - 1)));
-                    for (let sIdx = 0; sIdx < numSatSteps; sIdx++) {
-                        const sat = 1.0 - (sIdx * (0.7 / (numSatSteps - 1)));
-                        let gba5;
-                        
-                        // Check if this is position 2 (beige replacement)
-                        if (colorIndex === 2) {
-                            gba5 = NEW_HAIR_COLORS_GBA5.beige;
-                        } else {
-                            const targetRgb8 = hsvToRgb(hue, sat, val);
-                            gba5 = rgb8ToGbaRgb5(targetRgb8.r, targetRgb8.g, targetRgb8.b);
-                        }
-                        
-                        paletteGrid.appendChild(createPaletteColorBlock(gba5, gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5)));
-                        colorIndex++;
-                    }
-                }
-            }
-
-            const grayIndex = palIdx;
-            const minGrayLevel = 3; const maxGrayLevel = 31;
-            let grayLevelStep = 0;
-            if (GENERAL_HUES_DEG.length > 1) grayLevelStep = (maxGrayLevel - minGrayLevel) / (GENERAL_HUES_DEG.length - 1);
-            
-            // Calculate original grayscale value for this palette
-            const originalGrayLevel = Math.round(maxGrayLevel - (grayIndex * grayLevelStep));
-            let finalGrayscaleGba5;
-
-            // Implement color chain movements and new color replacements
-            if (palIdx === 0) { // Red palette - replace with burgundy
-                finalGrayscaleGba5 = NEW_HAIR_COLORS_GBA5.burgundy;
-            } else if (palIdx === 1) { // Orange + Skin palette - replace with dark brown
-                finalGrayscaleGba5 = NEW_HAIR_COLORS_GBA5.darkBrown;
-            } else if (palIdx === 2) { // Yellow palette - gets white (moved from chain)
-                finalGrayscaleGba5 = NEW_HAIR_COLORS_GBA5.white;
-            } else if (palIdx === 3) { // Lime Green palette - gets yellow's original gray
-                const yellowGrayIndex = 2; // Yellow is palIdx 2
-                const yellowOriginalGray = Math.round(maxGrayLevel - (yellowGrayIndex * grayLevelStep));
-                finalGrayscaleGba5 = { r5: yellowOriginalGray, g5: yellowOriginalGray, b5: yellowOriginalGray };
-            } else if (palIdx === 4) { // Green-Cyan palette - gets lime green's original gray
-                const limeGreenGrayIndex = 3; // Lime Green is palIdx 3
-                const limeGreenOriginalGray = Math.round(maxGrayLevel - (limeGreenGrayIndex * grayLevelStep));
-                finalGrayscaleGba5 = { r5: limeGreenOriginalGray, g5: limeGreenOriginalGray, b5: limeGreenOriginalGray };
-            } else if (palIdx === 5) { // Cyan palette - gets green-cyan's original gray
-                const greenCyanGrayIndex = 4; // Green-Cyan is palIdx 4
-                const greenCyanOriginalGray = Math.round(maxGrayLevel - (greenCyanGrayIndex * grayLevelStep));
-                finalGrayscaleGba5 = { r5: greenCyanOriginalGray, g5: greenCyanOriginalGray, b5: greenCyanOriginalGray };
-            } else if (palIdx === 6) { // Azure palette - gets cyan's original gray
-                const cyanGrayIndex = 5; // Cyan is palIdx 5
-                const cyanOriginalGray = Math.round(maxGrayLevel - (cyanGrayIndex * grayLevelStep));
-                finalGrayscaleGba5 = { r5: cyanOriginalGray, g5: cyanOriginalGray, b5: cyanOriginalGray };
-            } else {
-                // For Blue (7), Violet (8), Magenta (9) - keep original grayscale
-                finalGrayscaleGba5 = { r5: originalGrayLevel, g5: originalGrayLevel, b5: originalGrayLevel };
-            }
-
-            paletteGrid.appendChild(createPaletteColorBlock(finalGrayscaleGba5, gbaRgb5ToRgb8(finalGrayscaleGba5.r5, finalGrayscaleGba5.g5, finalGrayscaleGba5.b5)));
             
             paletteGroup.appendChild(paletteGrid);
             generalHuePalettesDisplay.appendChild(paletteGroup);
         }
-        // Set initial selected color to the first color of the first general palette
-        const firstHue = GENERAL_HUES_DEG[0];
-        const firstVal = 1.0; const firstSat = 1.0;
-        const initialRgb8 = hsvToRgb(firstHue,firstSat,firstVal);
-        const initialGba5 = rgb8ToGbaRgb5(initialRgb8.r, initialRgb8.g, initialRgb8.b);
-        updateSelectedColorDisplay(initialGba5, gbaRgb5ToRgb8(initialGba5.r5, initialGba5.g5, initialGba5.b5));
+        
+        console.log('✅ Generated palettes directly from JSON array');
+        
+        // Set initial selected color to the first color from palette 6 (index 96)
+        if (GBA_FULL_PALETTE_ARRAY.length > 96) {
+            const firstAvailableColor = GBA_FULL_PALETTE_ARRAY[96]; // First color of palette 6
+            const colorInt = gbaHex15ToInt(firstAvailableColor);
+            const gba5 = gbaIntToGba5(colorInt);
+            const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+            updateSelectedColorDisplay(gba5, rgb8);
+        }
     }
 
     // --- Grid & Drawing Functions (from draw/script.js, adapted for fixed size) ---
@@ -692,11 +369,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Export Functions (from draw/script.js, adapted) ---
-    function downloadCanvasAsPNG() { /* ... (logic from draw/script.js, ensure it uses GRID_WIDTH, GRID_HEIGHT, gbaIntToGba5, and gbaRgb5ToRgb8) ... */ 
-        let filename = (artworkTitleElement.childNodes[0].nodeValue.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'sprite') + '.png';
-        const tempCanvas = document.createElement('canvas'); tempCanvas.width = GRID_WIDTH; tempCanvas.height = GRID_HEIGHT; const tempCtx = tempCanvas.getContext('2d'); tempCtx.imageSmoothingEnabled = false;
-        for (let y = 0; y < GRID_HEIGHT; y++) { for (let x = 0; x < GRID_WIDTH; x++) { const colorInt = pixelGrid[y][x]; if (colorInt !== null) { const gba5 = gbaIntToGba5(colorInt); const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5); tempCtx.fillStyle = `rgb(${rgb8.r}, ${rgb8.g}, ${rgb8.b})`; tempCtx.fillRect(x, y, 1, 1); } } }
-        const downloadLink = document.createElement('a'); downloadLink.download = filename; downloadLink.href = tempCanvas.toDataURL('image/png'); document.body.appendChild(downloadLink); downloadLink.click(); document.body.removeChild(downloadLink);
+    function downloadCanvasAsPNG() {
+        // Helper function to check if a frame has any non-null pixels
+        function frameHasData(frameData) {
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    if (frameData[y][x] !== null) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Helper function to draw a frame to a canvas context
+        function drawFrameToCanvas(frameData, ctx, offsetX = 0, offsetY = 0) {
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    const colorInt = frameData[y][x];
+                    if (colorInt !== null) {
+                        const gba5 = gbaIntToGba5(colorInt);
+                        const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+                        ctx.fillStyle = `rgb(${rgb8.r}, ${rgb8.g}, ${rgb8.b})`;
+                        ctx.fillRect(offsetX + x, offsetY + y, 1, 1);
+                    }
+                }
+            }
+        }
+
+        // Check which frames have data
+        const frameAHasData = frameHasData(frameAData);
+        const frameBHasData = frameHasData(frameBData);
+        
+        let baseFilename = artworkTitleElement.childNodes[0].nodeValue.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'sprite';
+        let filename, canvasWidth, canvasHeight;
+        
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.imageSmoothingEnabled = false;
+        
+        if (frameAHasData && frameBHasData) {
+            // Both frames have data - create side-by-side image
+            filename = baseFilename + '_animation.png';
+            canvasWidth = GRID_WIDTH * 2; // Two frames side by side
+            canvasHeight = GRID_HEIGHT;
+            
+            tempCanvas.width = canvasWidth;
+            tempCanvas.height = canvasHeight;
+            
+            // Draw Frame A on the left
+            drawFrameToCanvas(frameAData, tempCtx, 0, 0);
+            
+            // Draw Frame B on the right
+            drawFrameToCanvas(frameBData, tempCtx, GRID_WIDTH, 0);
+            
+        } else if (frameAHasData) {
+            // Only Frame A has data
+            filename = baseFilename + '_frame_a.png';
+            canvasWidth = GRID_WIDTH;
+            canvasHeight = GRID_HEIGHT;
+            
+            tempCanvas.width = canvasWidth;
+            tempCanvas.height = canvasHeight;
+            
+            drawFrameToCanvas(frameAData, tempCtx, 0, 0);
+            
+        } else if (frameBHasData) {
+            // Only Frame B has data
+            filename = baseFilename + '_frame_b.png';
+            canvasWidth = GRID_WIDTH;
+            canvasHeight = GRID_HEIGHT;
+            
+            tempCanvas.width = canvasWidth;
+            tempCanvas.height = canvasHeight;
+            
+            drawFrameToCanvas(frameBData, tempCtx, 0, 0);
+            
+        } else {
+            // No data in either frame
+            alert("No pixel data to export. Please draw something first!");
+            return;
+        }
+        
+        // Download the PNG
+        const downloadLink = document.createElement('a');
+        downloadLink.download = filename;
+        downloadLink.href = tempCanvas.toDataURL('image/png');
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
     }
 
     // New function to download bitmap string
@@ -1093,7 +854,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Initialization ---
-    function init() {
+    async function init() {
+        // Load palette from JSON first
+        console.log('🔄 Loading color palette...');
+        await loadPaletteFromJSON();
+        
         // Setup main canvas
         canvas.width = GRID_WIDTH * PIXEL_SIZE;
         canvas.height = GRID_HEIGHT * PIXEL_SIZE;
@@ -1113,7 +878,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setActiveTool('pencil');
         redrawAll(); 
         updateOnionSkin(); // Initialize onion skin
-        console.log('GBA Self-Sprite Editor with Animation Initialized.');
+        console.log('✅ GBA Self-Sprite Editor with Animation Initialized.');
     }
 
     init();

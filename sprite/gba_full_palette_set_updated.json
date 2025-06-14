@@ -254,5 +254,10 @@
  "0x1C0C",
  "0x248C",
  "0x2D2C",
- "0x0C63"
+ "0x0C63\" ]\n\n    // --- State Variables (from draw/script.js",
+ "adapted) ---\n    let selectedTool = 'pencil';\n    let isDrawing = false;\n    let pixelGrid;\n    let usedColors = new Set(); // Stores 15-bit hex strings of used colors\n    let currentGba5Color = { r5: 0",
+ "g5: 0",
+ "b5: 0 }; // Default to black\n    let currentDisplayRgb8Color = {r:0",
+ "g:0",
+ "b:0};\n\n    // Undo/Redo \n    let history = ["
 ]
