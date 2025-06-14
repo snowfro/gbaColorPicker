@@ -10,6 +10,197 @@ body {
     min-height: 100vh;
 }
 
+/* Centered Header */
+.app-header {
+    width: 100%;
+    max-width: 1400px;
+    padding: 15px 20px 5px 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.app-header h1 {
+    margin: 0;
+    text-align: center;
+}
+
+/* Instructions Button Container - Centered Below Main Content */
+.instructions-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0 30px 0;
+}
+
+.instructions-button {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.instructions-button:hover {
+    background: linear-gradient(135deg, #2980b9, #1f5f8b);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.instructions-button:active {
+    transform: translateY(0);
+}
+
+/* Instructions Drawer */
+.instructions-drawer {
+    position: fixed;
+    top: 0;
+    right: -500px;
+    width: 500px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+}
+
+.instructions-drawer.open {
+    right: 0;
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.drawer-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.drawer-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.drawer-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.close-drawer-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    line-height: 1;
+}
+
+.close-drawer-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.drawer-body {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+}
+
+.instruction-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.instruction-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.instruction-section h3 {
+    color: #2c3e50;
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.instruction-section ol,
+.instruction-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.instruction-section li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.instruction-section li strong {
+    color: #2c3e50;
+}
+
+/* Mobile responsiveness for drawer */
+@media (max-width: 768px) {
+    .instructions-drawer {
+        width: 100vw;
+        right: -100vw;
+    }
+    
+    .app-header {
+        padding: 10px 15px 5px 15px;
+    }
+    
+    .app-header h1 {
+        font-size: 24px;
+    }
+    
+    .instructions-button-container {
+        padding: 15px 0 20px 0;
+    }
+    
+    .instructions-button {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    
+    .drawer-body {
+        padding: 20px;
+    }
+}
+
 h1, h3 {
     text-align: center;
     color: #2c3e50;

@@ -8,16 +8,74 @@
     <!-- Consider linking to a shared base style if many styles are common -->
 </head>
 <body>
-    <h1>Self Portrait</h1>
-    <p class="description">Create a pixel art self-portrait by selecting colors from the palettes and placing them on the canvas.</p>
-    <ol class="instructions">
-        <li>Draw your full-body portrait</li>
-        <li>Leave the background transparent (don't fill around your figure)</li>
-        <li>Fill all pixels within your drawing (unless transparency is intentional)</li>
-        <li>Grayscale colors are available at the end of each palette</li>
-        <li>When finished, name your creation (pencil icon) and click "Download Bitmap String"</li>
-        <li>Share via email or DM</li>
-    </ol>
+    <!-- Centered Header -->
+    <header class="app-header">
+        <h1>Self Portrait Maker</h1>
+    </header>
+
+    <!-- Instructions Drawer -->
+    <div id="instructions-drawer" class="instructions-drawer">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h2>How to Create Your Sprite</h2>
+                <button id="close-drawer-btn" class="close-drawer-btn">&times;</button>
+            </div>
+            <div class="drawer-body">
+                <div class="instruction-section">
+                    <h3>🎨 Getting Started</h3>
+                    <ol>
+                        <li><strong>Select colors</strong> from the palettes below</li>
+                        <li><strong>Choose your tool:</strong> Paintbrush 🖌️, Eraser 🧼, or Eyedropper 💧</li>
+                        <li><strong>Draw on the canvas</strong> by clicking and dragging</li>
+                    </ol>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3>🖼️ Drawing Tips</h3>
+                    <ul>
+                        <li><strong>Portrait focus:</strong> Draw your full-body self-portrait</li>
+                        <li><strong>Transparency:</strong> Leave background transparent (don't fill around your figure)</li>
+                        <li><strong>Fill completely:</strong> Fill all pixels within your drawing (unless transparency is intentional)</li>
+                        <li><strong>Grayscale:</strong> Available at the end of each palette for details</li>
+                    </ul>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3>🎬 Animation Features</h3>
+                    <ul>
+                        <li><strong>Frame A/B:</strong> Switch between two animation frames</li>
+                        <li><strong>Copy Frame:</strong> Duplicate one frame to the other</li>
+                        <li><strong>Preview:</strong> See your animation in action</li>
+                        <li><strong>Onion Skin:</strong> See the other frame as a ghost overlay</li>
+                    </ul>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3>💾 Saving & Sharing</h3>
+                    <ol>
+                        <li><strong>Name your sprite:</strong> Click the pencil icon ✏️ next to "My Sprite"</li>
+                        <li><strong>Download PNG:</strong> Get a visual image file</li>
+                        <li><strong>Download Bitmap:</strong> Get the game-compatible .txt file</li>
+                        <li><strong>Load Bitmap:</strong> Import a previously saved .txt file</li>
+                        <li><strong>Share:</strong> Send your files via email or DM</li>
+                    </ol>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3>⌨️ Pro Tips</h3>
+                    <ul>
+                        <li><strong>Undo:</strong> Use the ↩️ button to undo mistakes</li>
+                        <li><strong>Eyedropper:</strong> Sample colors from your existing drawing</li>
+                        <li><strong>Used Colors:</strong> See all colors you've used in the bottom panel</li>
+                        <li><strong>Color Info:</strong> Hover over palette colors to see their index numbers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer Overlay -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
 
     <div class="app-container">
         <!-- Color Selection Area - General Hue Palettes -->
@@ -78,6 +136,13 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Centered Instructions Button -->
+    <div class="instructions-button-container">
+        <button id="instructions-btn" class="instructions-button">
+            📖 Instructions
+        </button>
     </div>
 
     <script src="script.js"></script>

@@ -151,13 +151,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const titleDiv = document.createElement('div');
             titleDiv.classList.add('palette-title');
             
-            // Use descriptive names for palettes 6-15
+            // Use descriptive names for palettes 6-15 (sprite-available palettes)
             const paletteNames = [
-                "Red", "Orange + Skin", "Yellow", "Lime Green", "Green-Cyan",
-                "Cyan", "Azure", "Blue", "Violet", "Magenta",
-                "Palette 10", "Palette 11", "Palette 12", "Palette 13", "Palette 14", "Palette 15"
+                "Reds", "Oranges", "Yellows", "Lime Greens", "Green-Cyans",
+                "Cyans", "Azures", "Blues", "Violets", "Magentas"
             ];
-            titleDiv.textContent = paletteNames[paletteIdx];
+            // Adjust index since we're starting from palette 6 but array starts at 0
+            const nameIndex = paletteIdx - 6;
+            titleDiv.textContent = paletteNames[nameIndex] || `Palette ${paletteIdx}`;
             paletteGroup.appendChild(titleDiv);
             
             const paletteGrid = document.createElement('div');
@@ -701,6 +702,42 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('touchend', (e) => { e.preventDefault(); if(isDrawing) isDrawing = false; });
     canvas.addEventListener('touchcancel', (e) => { e.preventDefault(); if(isDrawing) isDrawing = false; });
     if (artworkTitleElement) { artworkTitleElement.addEventListener('click', function(e) { if (e.target === this || e.target.classList.contains('edit-icon')) { const currentTitle = this.childNodes[0].nodeValue.trim(); const newTitle = prompt("Sprite Name:", currentTitle); if (newTitle !== null && newTitle.trim() !== "") { this.childNodes[0].nodeValue = newTitle.trim() + " ";}}});}
+
+    // --- Instructions Drawer Functions ---
+    const instructionsBtn = document.getElementById('instructions-btn');
+    const instructionsDrawer = document.getElementById('instructions-drawer');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    const closeDrawerBtn = document.getElementById('close-drawer-btn');
+
+    function openInstructionsDrawer() {
+        instructionsDrawer.classList.add('open');
+        drawerOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeInstructionsDrawer() {
+        instructionsDrawer.classList.remove('open');
+        drawerOverlay.classList.remove('active');
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+
+    // Event listeners for drawer
+    if (instructionsBtn) {
+        instructionsBtn.addEventListener('click', openInstructionsDrawer);
+    }
+    if (closeDrawerBtn) {
+        closeDrawerBtn.addEventListener('click', closeInstructionsDrawer);
+    }
+    if (drawerOverlay) {
+        drawerOverlay.addEventListener('click', closeInstructionsDrawer);
+    }
+
+    // Close drawer with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && instructionsDrawer.classList.contains('open')) {
+            closeInstructionsDrawer();
+        }
+    });
 
     // --- Animation Functions ---
     function switchToFrame(frameId) {
