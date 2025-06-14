@@ -11,16 +11,29 @@
     <!-- Centered Header -->
     <header class="app-header">
         <h1>Self Portrait Maker</h1>
+        <p>Please hit the instructions button below and read thoroughly before getting started!</p>
     </header>
 
     <!-- Instructions Drawer -->
     <div id="instructions-drawer" class="instructions-drawer">
         <div class="drawer-content">
             <div class="drawer-header">
-                <h2>How to Create Your Sprite</h2>
+                <h2>Create Your Sprite Self Portrait</h2>
                 <button id="close-drawer-btn" class="close-drawer-btn">&times;</button>
             </div>
             <div class="drawer-body">
+
+                <div class="instruction-section">
+                    <h3>？Why</h3>
+                    <p>So many people have been such a huge part of my journey and I'd love to include as many of you as possible in my project! </p>
+                    <ul>
+                        <li>Use this tool to generate a pixel version of yourself.</li>
+                        <li>Check out the examples below to get started.</li>
+                        <li>Please make a two frame animation, so make sure and fill in both a and b frames.</li>
+                        <li>When you're done get the downloaded .txt and .png over to me.</li>
+                        <li>Note I may not get to include all of the sprites that are submitted, but I'll try my best!</li>
+                    </ul>
+                </div>
                 <div class="instruction-section">
                     <h3>🎨 Getting Started</h3>
                     <ol>
@@ -69,6 +82,24 @@
                         <li><strong>Used Colors:</strong> See all colors you've used in the bottom panel</li>
                         <li><strong>Color Info:</strong> Hover over palette colors to see their index numbers</li>
                     </ul>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3>🎯 Examples</h3>
+                    <p>Try these example sprites to get started:</p>
+                    <div id="examples-container" class="examples-container">
+                        <div class="examples-loading">Loading examples...</div>
+                    </div>
+                    <div class="examples-instructions">
+                        <p><strong>How to use:</strong></p>
+                        <ol>
+                            <li>Click "Download" next to any example</li>
+                            <li>Close this drawer</li>
+                            <li>Click "Load Bitmap String" button</li>
+                            <li>Select the downloaded .txt file</li>
+                            <li>Start editing or use as inspiration!</li>
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>

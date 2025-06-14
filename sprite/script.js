@@ -484,30 +484,30 @@ document.addEventListener('DOMContentLoaded', () => {
         // Helper function to generate bitmap string for a frame
         function generateFrameBitmapString(frameData) {
             let frameString = "";
-            
-            for (let y = 0; y < GRID_HEIGHT; y++) {
-                for (let x = 0; x < GRID_WIDTH; x++) {
+
+        for (let y = 0; y < GRID_HEIGHT; y++) {
+            for (let x = 0; x < GRID_WIDTH; x++) {
                     const colorInt = frameData[y][x];
-                    if (colorInt === null) {
+                if (colorInt === null) {
                         frameString += "00";
-                    } else {
-                        const gba5 = gbaIntToGba5(colorInt);
-                        const gbaHexColorString = gbaRgb5ToHex15(gba5.r5, gba5.g5, gba5.b5);
-                        
-                        let determinedPaletteIndex = -1;
-                        
+                } else {
+                    const gba5 = gbaIntToGba5(colorInt);
+                    const gbaHexColorString = gbaRgb5ToHex15(gba5.r5, gba5.g5, gba5.b5);
+                    
+                    let determinedPaletteIndex = -1;
+
                         // Iterative check for the 96-255 range
-                        for (let i = 96; i <= 255; i++) {
-                            if (GBA_FULL_PALETTE_ARRAY[i] === gbaHexColorString) {
-                                determinedPaletteIndex = i;
-                                break;
-                            }
+                    for (let i = 96; i <= 255; i++) {
+                        if (GBA_FULL_PALETTE_ARRAY[i] === gbaHexColorString) {
+                            determinedPaletteIndex = i;
+                            break;
                         }
+                    }
 
                         if (determinedPaletteIndex !== -1) {
                             frameString += determinedPaletteIndex.toString(16).padStart(2, '0').toUpperCase();
-                        } else {
-                            console.warn(`DOWNLOAD: Color ${gbaHexColorString} at (x:${x},y:${y}) was not found in GBA_FULL_PALETTE_ARRAY[96-255]. Writing '00'.`);
+                    } else {
+                        console.warn(`DOWNLOAD: Color ${gbaHexColorString} at (x:${x},y:${y}) was not found in GBA_FULL_PALETTE_ARRAY[96-255]. Writing '00'.`);
                             frameString += "00"; 
                         }
                     }
@@ -603,9 +603,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isDoubleFrame) {
                 loadFrameFromString(sanitizedContent.substring(singleFrameLength), 'B');
                 alert("Loaded two-frame sprite successfully!");
-            } else {
+                        } else {
                 alert("Loaded single-frame sprite into Frame A successfully!");
-            }
+                        }
             
             // Ensure we're viewing Frame A after loading
             switchToFrame('A');
@@ -713,6 +713,12 @@ document.addEventListener('DOMContentLoaded', () => {
         instructionsDrawer.classList.add('open');
         drawerOverlay.classList.add('active');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        
+        // Load examples when drawer opens (only load once)
+        if (!instructionsDrawer.dataset.examplesLoaded) {
+            loadExamples();
+            instructionsDrawer.dataset.examplesLoaded = 'true';
+        }
     }
 
     function closeInstructionsDrawer() {
@@ -738,6 +744,148 @@ document.addEventListener('DOMContentLoaded', () => {
             closeInstructionsDrawer();
         }
     });
+
+    // --- Examples Loading Functions ---
+    async function loadExamples() {
+        const examplesContainer = document.getElementById('examples-container');
+        if (!examplesContainer) return;
+
+        try {
+            // Try to fetch the examples directory listing
+            // Note: This approach works with a local server but may need adjustment for different setups
+            const examples = await discoverExamples();
+            
+            if (examples.length === 0) {
+                examplesContainer.innerHTML = '<div class="examples-loading">No examples found in the examples folder.</div>';
+                return;
+            }
+
+            examplesContainer.innerHTML = '';
+            
+            examples.forEach(example => {
+                const exampleItem = createExampleItem(example);
+                examplesContainer.appendChild(exampleItem);
+            });
+
+        } catch (error) {
+            console.error('Failed to load examples:', error);
+            examplesContainer.innerHTML = '<div class="examples-loading">Unable to load examples. Make sure you\'re running a local server.</div>';
+        }
+    }
+
+    async function discoverExamples() {
+        // For now, we'll use a hardcoded list since directory listing requires server-side support
+        // In the future, this could be enhanced to dynamically discover files
+        const knownExamples = ['snowbro'];
+        const examples = [];
+
+        for (const exampleName of knownExamples) {
+            try {
+                // Check if both .txt and .png files exist
+                const txtResponse = await fetch(`examples/${exampleName}.txt`);
+                const pngResponse = await fetch(`examples/${exampleName}.png`);
+                
+                if (txtResponse.ok && pngResponse.ok) {
+                    examples.push({
+                        name: exampleName,
+                        txtFile: `examples/${exampleName}.txt`,
+                        pngFile: `examples/${exampleName}.png`
+                    });
+                }
+            } catch (error) {
+                console.warn(`Example ${exampleName} not found:`, error);
+            }
+        }
+
+        return examples;
+    }
+
+    function createExampleItem(example) {
+        const item = document.createElement('div');
+        item.className = 'example-item';
+
+        // Create the preview container
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'example-preview';
+        
+        // Create canvas for animation (correct 16x32 aspect ratio, scaled up 2x)
+        const canvas = document.createElement('canvas');
+        canvas.width = 32; // 16px * 2 scale
+        canvas.height = 64; // 32px * 2 scale
+        previewDiv.appendChild(canvas);
+
+        // Create info section
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'example-info';
+        infoDiv.innerHTML = `<div class="example-name">${example.name}</div>`;
+
+        // Create download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = example.txtFile;
+        downloadLink.download = `${example.name}.txt`;
+        downloadLink.className = 'example-download';
+        downloadLink.textContent = '📥 Download';
+
+        // Assemble the item
+        item.appendChild(previewDiv);
+        item.appendChild(infoDiv);
+        item.appendChild(downloadLink);
+
+        // Start the animation
+        startExampleAnimation(canvas, example.pngFile);
+
+        return item;
+    }
+
+    async function startExampleAnimation(canvas, pngFile) {
+        try {
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            
+            // Load the sprite sheet image
+            const img = new Image();
+            img.onload = () => {
+                let showingFrameA = true;
+                
+                // Function to draw a frame
+                const drawFrame = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    if (showingFrameA) {
+                        // Draw Frame A (left half of the sprite sheet) - maintain 16x32 aspect ratio
+                        ctx.drawImage(img, 0, 0, 16, 32, 0, 0, 32, 64);
+                    } else {
+                        // Draw Frame B (right half of the sprite sheet) - maintain 16x32 aspect ratio
+                        ctx.drawImage(img, 16, 0, 16, 32, 0, 0, 32, 64);
+                    }
+                };
+                
+                // Initial draw
+                drawFrame();
+                
+                // Animate between frames
+                setInterval(() => {
+                    showingFrameA = !showingFrameA;
+                    drawFrame();
+                }, 800); // 800ms interval for smooth animation
+            };
+            
+            img.onerror = () => {
+                // Fallback: draw a simple placeholder
+                ctx.fillStyle = '#e0e0e0';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#999';
+                ctx.font = '8px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText('?', canvas.width/2, canvas.height/2);
+            };
+            
+            img.src = pngFile;
+            
+        } catch (error) {
+            console.error('Failed to load example animation:', error);
+        }
+    }
 
     // --- Animation Functions ---
     function switchToFrame(frameId) {

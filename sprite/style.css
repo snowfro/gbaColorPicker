@@ -172,6 +172,113 @@ body {
     color: #2c3e50;
 }
 
+/* Examples Section */
+.examples-container {
+    margin: 15px 0;
+}
+
+.examples-loading {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    padding: 20px;
+}
+
+.example-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+    transition: background-color 0.2s ease;
+}
+
+.example-item:hover {
+    background: #f0f0f0;
+}
+
+.example-preview {
+    width: 80px;
+    height: 160px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.example-preview canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+.example-info {
+    flex: 1;
+}
+
+.example-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    text-transform: capitalize;
+}
+
+
+
+.example-download {
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.example-download:hover {
+    background: linear-gradient(135deg, #229954, #1e8449);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.examples-instructions {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.examples-instructions p {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.examples-instructions ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.examples-instructions li {
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
 /* Mobile responsiveness for drawer */
 @media (max-width: 768px) {
     .instructions-drawer {
