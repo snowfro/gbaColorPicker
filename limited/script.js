@@ -130,6 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
         {r5: 15, g5: 8, b5: 6}    // R: 122, G: 62, B: 51   -> 0x190F
     ];
 
+    // Define new hair colors for palette updates
+    const NEW_HAIR_COLORS_GBA5 = {
+        burgundy: {r5: 23, g5: 7, b5: 3},    // R: 190, G: 55, B: 25 -> 0x0CF7
+        darkBrown: {r5: 10, g5: 7, b5: 4},   // R: 84, G: 58, B: 35 -> 0x10EA
+        beige: {r5: 29, g5: 29, b5: 21},     // R: 240, G: 236, B: 173 -> 0x57BD
+        white: {r5: 31, g5: 31, b5: 31}      // R: 255, G: 255, B: 255 -> 0x7FFF
+    };
+
     // Store GBA 5-bit colors for all palettes for JSON export
     let allPalettesGba5 = Array(16).fill(null).map(() => Array(16).fill(null)); 
 
@@ -247,6 +255,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
+                // Special handling for Palette 8 (Yellow) - replace position 2 with beige
+                if (palIdx === 8) {
+                    if (hueVariationsGba5.length > 2) {
+                        hueVariationsGba5[2] = NEW_HAIR_COLORS_GBA5.beige;
+                    }
+                }
+
                 hueVariationsGba5.forEach((gba5, i) => {
                     currentPaletteColorsGba5.push(gba5);
                     allPalettesGba5[palIdx][i] = gba5;
@@ -262,12 +277,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (numGeneralHues > 1) {
                     grayLevelStep = (maxGrayLevel - minGrayLevel) / (numGeneralHues - 1);
                 }
-                const grayLevel = Math.round(maxGrayLevel - (grayIndex * grayLevelStep));
-                const grayscaleGba5 = { r5: grayLevel, g5: grayLevel, b5: grayLevel };
-                currentPaletteColorsGba5.push(grayscaleGba5);
-                allPalettesGba5[palIdx][15] = grayscaleGba5;
-                const grayscaleRgb8 = gbaRgb5ToRgb8(grayscaleGba5.r5, grayscaleGba5.g5, grayscaleGba5.b5);
-                paletteGrid.appendChild(createColorBlock(grayscaleGba5, grayscaleRgb8));
+                
+                // Calculate original grayscale value for this palette
+                const originalGrayLevel = Math.round(maxGrayLevel - (grayIndex * grayLevelStep));
+                let finalGrayscaleGba5;
+
+                // Implement color chain movements and new color replacements
+                if (palIdx === 6) { // Red palette - replace with burgundy
+                    finalGrayscaleGba5 = NEW_HAIR_COLORS_GBA5.burgundy;
+                } else if (palIdx === 7) { // Orange + Skin palette - replace with dark brown
+                    finalGrayscaleGba5 = NEW_HAIR_COLORS_GBA5.darkBrown;
+                } else if (palIdx === 8) { // Yellow palette - gets white (moved from chain)
+                    finalGrayscaleGba5 = NEW_HAIR_COLORS_GBA5.white;
+                } else if (palIdx === 9) { // Lime Green palette - gets yellow's original gray
+                    const yellowGrayIndex = 2; // Yellow is palette 8, so grayIndex = 8-6 = 2
+                    const yellowOriginalGray = Math.round(maxGrayLevel - (yellowGrayIndex * grayLevelStep));
+                    finalGrayscaleGba5 = { r5: yellowOriginalGray, g5: yellowOriginalGray, b5: yellowOriginalGray };
+                } else if (palIdx === 10) { // Green-Cyan palette - gets lime green's original gray
+                    const limeGreenGrayIndex = 3; // Lime Green is palette 9, so grayIndex = 9-6 = 3
+                    const limeGreenOriginalGray = Math.round(maxGrayLevel - (limeGreenGrayIndex * grayLevelStep));
+                    finalGrayscaleGba5 = { r5: limeGreenOriginalGray, g5: limeGreenOriginalGray, b5: limeGreenOriginalGray };
+                } else if (palIdx === 11) { // Cyan palette - gets green-cyan's original gray
+                    const greenCyanGrayIndex = 4; // Green-Cyan is palette 10, so grayIndex = 10-6 = 4
+                    const greenCyanOriginalGray = Math.round(maxGrayLevel - (greenCyanGrayIndex * grayLevelStep));
+                    finalGrayscaleGba5 = { r5: greenCyanOriginalGray, g5: greenCyanOriginalGray, b5: greenCyanOriginalGray };
+                } else if (palIdx === 12) { // Azure palette - gets cyan's original gray
+                    const cyanGrayIndex = 5; // Cyan is palette 11, so grayIndex = 11-6 = 5
+                    const cyanOriginalGray = Math.round(maxGrayLevel - (cyanGrayIndex * grayLevelStep));
+                    finalGrayscaleGba5 = { r5: cyanOriginalGray, g5: cyanOriginalGray, b5: cyanOriginalGray };
+                } else {
+                    // For Blue (13), Violet (14), Magenta (15) - keep original grayscale
+                    finalGrayscaleGba5 = { r5: originalGrayLevel, g5: originalGrayLevel, b5: originalGrayLevel };
+                }
+
+                currentPaletteColorsGba5.push(finalGrayscaleGba5);
+                allPalettesGba5[palIdx][15] = finalGrayscaleGba5;
+                const grayscaleRgb8 = gbaRgb5ToRgb8(finalGrayscaleGba5.r5, finalGrayscaleGba5.g5, finalGrayscaleGba5.b5);
+                paletteGrid.appendChild(createColorBlock(finalGrayscaleGba5, grayscaleRgb8));
             }
             paletteGroup.appendChild(paletteGrid);
             if (palIdx <= 5) {
