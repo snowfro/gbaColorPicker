@@ -23,6 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const bitmapFileInput = document.getElementById('bitmap-file-input');
     const artworkTitleElement = document.getElementById('artwork-title');
 
+    // Welcome Modal Elements
+    const welcomeModal = document.getElementById('welcome-modal');
+    const welcomeOverlay = document.getElementById('welcome-overlay');
+    const readInstructionsBtn = document.getElementById('read-instructions-btn');
+    const skipInstructionsBtn = document.getElementById('skip-instructions-btn');
+
     // Color Info Display (from limited/script.js)
     const selectedColorPreview = document.getElementById('selected-color-preview');
     const value15bitSpan = document.getElementById('selected-color-value-15bit');
@@ -727,6 +733,27 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = ''; // Restore scrolling
     }
 
+    // --- Welcome Modal Functions ---
+    function showWelcomeModal() {
+        welcomeModal.classList.add('active');
+        welcomeOverlay.classList.add('active');
+    }
+
+    function hideWelcomeModal() {
+        welcomeModal.classList.remove('active');
+        welcomeOverlay.classList.remove('active');
+        // Remember that user has visited
+        localStorage.setItem('spriteEditorVisited', 'true');
+    }
+
+    function checkFirstVisit() {
+        const hasVisited = localStorage.getItem('spriteEditorVisited');
+        if (!hasVisited) {
+            // Small delay to let the page fully load first
+            setTimeout(showWelcomeModal, 500);
+        }
+    }
+
     // Event listeners for drawer
     if (instructionsBtn) {
         instructionsBtn.addEventListener('click', openInstructionsDrawer);
@@ -743,7 +770,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape' && instructionsDrawer.classList.contains('open')) {
             closeInstructionsDrawer();
         }
+        if (e.key === 'Escape' && welcomeModal.classList.contains('active')) {
+            hideWelcomeModal();
+        }
     });
+
+    // Welcome modal event listeners
+    if (readInstructionsBtn) {
+        readInstructionsBtn.addEventListener('click', () => {
+            hideWelcomeModal();
+            // Small delay to let modal close, then open instructions
+            setTimeout(openInstructionsDrawer, 200);
+        });
+    }
+
+    if (skipInstructionsBtn) {
+        skipInstructionsBtn.addEventListener('click', hideWelcomeModal);
+    }
+
+    if (welcomeOverlay) {
+        welcomeOverlay.addEventListener('click', hideWelcomeModal);
+    }
 
     // --- Examples Loading Functions ---
     async function loadExamples() {
@@ -1063,6 +1110,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setActiveTool('pencil');
         redrawAll(); 
         updateOnionSkin(); // Initialize onion skin
+        
+        // Check if this is the user's first visit
+        checkFirstVisit();
+        
         console.log('✅ GBA Self-Sprite Editor with Animation Initialized.');
     }
 

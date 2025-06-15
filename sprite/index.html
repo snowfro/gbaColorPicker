@@ -11,7 +11,8 @@
     <!-- Centered Header -->
     <header class="app-header">
         <h1>Self Portrait Maker</h1>
-        <p>Please hit the instructions button below and read thoroughly before getting started!</p>
+        <p><strong>📖 Please read the instructions thoroughly before getting started!</strong></p>
+        
     </header>
 
     <!-- Instructions Drawer -->
@@ -30,7 +31,8 @@
                         <li>Use this tool to generate a pixel version of yourself.</li>
                         <li>Check out the examples below to get started.</li>
                         <li>Please make a two frame animation, so make sure and fill in both a and b frames.</li>
-                        <li>When you're done get the downloaded .txt and .png over to me.</li>
+                        <li><strong>Your character will stay in place and be looking forward in the final project, so your animation can be jumping, dancing, even walking in place is fine! Have fun with it.</strong></li>
+                        <li>When you're done with both frames hit the download buttons for the bitmap string and png and send both over to me.</li>
                         <li>Note I may not get to include all of the sprites that are submitted, but I'll try my best!</li>
                     </ul>
                     <p>Much love, Snowfro</p>
@@ -108,6 +110,35 @@
 
     <!-- Drawer Overlay -->
     <div id="drawer-overlay" class="drawer-overlay"></div>
+
+    <!-- First Visit Welcome Modal -->
+    <div id="welcome-modal" class="welcome-modal">
+        <div class="welcome-modal-content">
+            <div class="welcome-header">
+                <h2>👋 Welcome to the Sprite Self-Portrait Maker!</h2>
+            </div>
+            <div class="welcome-body">
+                <p><strong>First time here?</strong> Please take a moment to read the instructions thoroughly, even if you're an experienced pixel artist!</p>
+                <p>This tool is part of a special project to involve the community in my next artwork, and there are specific requirements for your sprite to be included:</p>
+                <ul>
+                    <li>✨ <strong>Two-frame animation</strong> (Frame A & B)</li>
+                    <li>🎯 <strong>16×32 pixel self-portrait</strong> touching the ground</li>
+                    <li>🎨 <strong>Generally facing forward</li>
+                    <li>📁 <strong>Make sure the title of your downloaded files makes it clear to me who you are!</li>
+                </ul>
+                <p>The instructions contain all the details plus helpful examples to get you started! Please read them thoroughly.</p>
+            </div>
+            <div class="welcome-actions">
+                <button id="read-instructions-btn" class="welcome-btn primary">
+                    📖 Read Instructions First
+                </button>
+                <button id="skip-instructions-btn" class="welcome-btn secondary">
+                    Skip (I've read them before)
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="welcome-overlay" class="welcome-overlay"></div>
 
     <div class="app-container">
         <!-- Color Selection Area - General Hue Palettes -->
