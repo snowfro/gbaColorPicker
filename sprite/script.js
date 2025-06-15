@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const onionSkinBtn = document.getElementById('onion-skin-btn');
     
     const downloadPngBtn = document.getElementById('download-png');
+    const downloadGifBtn = document.getElementById('download-gif');
     const downloadBitmapBtn = document.getElementById('download-bitmap-btn');
     const uploadBitmapBtn = document.getElementById('upload-bitmap-btn');
     const bitmapFileInput = document.getElementById('bitmap-file-input');
@@ -467,6 +468,140 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(downloadLink);
     }
 
+    function downloadAnimatedGIF() {
+        // Helper function to check if a frame has any non-null pixels
+        function frameHasData(frameData) {
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    if (frameData[y][x] !== null) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Helper function to create canvas from frame data
+        function createFrameCanvas(frameData, scale = 4, useWhiteBackground = true) {
+            const canvas = document.createElement('canvas');
+            canvas.width = GRID_WIDTH * scale;
+            canvas.height = GRID_HEIGHT * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+
+            // Option to fill with white background or leave transparent
+            if (useWhiteBackground) {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            // If useWhiteBackground is false, canvas starts transparent
+
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    const colorInt = frameData[y][x];
+                    if (colorInt !== null) {
+                        const gba5 = gbaIntToGba5(colorInt);
+                        const rgb8 = gbaRgb5ToRgb8(gba5.r5, gba5.g5, gba5.b5);
+                        ctx.fillStyle = `rgb(${rgb8.r}, ${rgb8.g}, ${rgb8.b})`;
+                        ctx.fillRect(x * scale, y * scale, scale, scale);
+                    }
+                }
+            }
+            return canvas;
+        }
+
+        // Check which frames have data
+        const frameAHasData = frameHasData(frameAData);
+        const frameBHasData = frameHasData(frameBData);
+
+        if (!frameAHasData && !frameBHasData) {
+            alert("No pixel data to export. Please draw something first!");
+            return;
+        }
+
+        // Determine filename
+        let baseFilename = artworkTitleElement.childNodes[0].nodeValue.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'sprite';
+        const filename = baseFilename + '_animation.gif';
+
+        // Show loading message
+        downloadGifBtn.disabled = true;
+        downloadGifBtn.textContent = 'Creating GIF...';
+
+        try {
+            // Check if gifshot library is available
+            if (typeof gifshot === 'undefined') {
+                throw new Error('Gifshot library not loaded');
+            }
+
+            console.log('Starting GIF creation with gifshot...');
+            
+            // Prepare images array for gifshot
+            const images = [];
+            
+            if (frameAHasData && frameBHasData) {
+                // Both frames exist - create animation
+                console.log('Creating 2-frame animation...');
+                const frameACanvas = createFrameCanvas(frameAData);
+                const frameBCanvas = createFrameCanvas(frameBData);
+                
+                images.push(frameACanvas.toDataURL());
+                images.push(frameBCanvas.toDataURL());
+            } else if (frameAHasData) {
+                // Only frame A - create a single frame GIF
+                console.log('Creating single frame (A) GIF...');
+                const frameACanvas = createFrameCanvas(frameAData);
+                images.push(frameACanvas.toDataURL());
+            } else if (frameBHasData) {
+                // Only frame B - create a single frame GIF  
+                console.log('Creating single frame (B) GIF...');
+                const frameBCanvas = createFrameCanvas(frameBData);
+                images.push(frameBCanvas.toDataURL());
+            }
+
+            // Create GIF using gifshot
+            gifshot.createGIF({
+                images: images,
+                gifWidth: GRID_WIDTH * 4,
+                gifHeight: GRID_HEIGHT * 4,
+                interval: 0.5, // 0.5 seconds between frames
+                numFrames: images.length,
+                frameDuration: images.length > 1 ? 0.5 : 1, // 0.5s for animation, 1s for single frame
+                progressCallback: function(captureProgress) {
+                    downloadGifBtn.textContent = `Creating GIF... ${Math.round(captureProgress * 100)}%`;
+                }
+            }, function(obj) {
+                if (!obj.error) {
+                    console.log('GIF creation successful!');
+                    
+                    // Create download link
+                    const downloadLink = document.createElement('a');
+                    downloadLink.download = filename;
+                    downloadLink.href = obj.image;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    
+                    console.log(`GIF download complete: ${filename}`);
+                } else {
+                    console.error('GIF creation error:', obj.error);
+                    alert('Error creating GIF: ' + obj.error);
+                }
+                
+                // Reset button
+                downloadGifBtn.disabled = false;
+                downloadGifBtn.textContent = 'Download GIF';
+            });
+
+        } catch (error) {
+            console.error('Error creating GIF:', error);
+            alert('Failed to create GIF. Please try again.');
+            
+            // Reset button
+            downloadGifBtn.disabled = false;
+            downloadGifBtn.textContent = 'Download GIF';
+        }
+    }
+
     // New function to download bitmap string
     function downloadBitmapString() {
         if (typeof GBA_FULL_PALETTE_ARRAY === 'undefined' || !Array.isArray(GBA_FULL_PALETTE_ARRAY)) {
@@ -691,6 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onionSkinBtn.addEventListener('click', toggleOnionSkin);
     
     downloadPngBtn.addEventListener('click', downloadCanvasAsPNG);
+    downloadGifBtn.addEventListener('click', downloadAnimatedGIF);
     downloadBitmapBtn.addEventListener('click', downloadBitmapString);
     uploadBitmapBtn.addEventListener('click', () => {
         if (confirm("This will replace the current sprite. Are you sure?")) {
