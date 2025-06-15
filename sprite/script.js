@@ -776,7 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function discoverExamples() {
         // For now, we'll use a hardcoded list since directory listing requires server-side support
         // In the future, this could be enhanced to dynamically discover files
-        const knownExamples = ['snowbro'];
+        const knownExamples = ['snowbro','goober','srita'];
         const examples = [];
 
         for (const exampleName of knownExamples) {
