@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvasContainer = document.getElementById('canvas-container');
     const pencilToolBtn = document.getElementById('pencil-tool');
     const eraserToolBtn = document.getElementById('eraser-tool');
+    const panToolBtn = document.getElementById('pan-tool');
     const undoButton = document.getElementById('undo-button');
     const eyedropperToolBtn = document.getElementById('eyedropper-tool');
     
@@ -107,6 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let traceZoom = 1.0; // 1.0 = 100%, 0.5 = 50%, 2.0 = 200%
     let traceOffsetX = 0; // X offset in pixels for nudging
     let traceOffsetY = 0; // Y offset in pixels for nudging
+
+    // Pan variables
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
 
     // --- Color Conversion Functions (Shared) ---
     function hsvToRgb(h, s, v) { /* ... from limited/script.js ... */ 
@@ -826,11 +832,22 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedTool = tool; 
         pencilToolBtn.classList.toggle('active', tool === 'pencil'); 
         eraserToolBtn.classList.toggle('active', tool === 'eraser'); 
+        panToolBtn.classList.toggle('active', tool === 'pan');
         eyedropperToolBtn.classList.toggle('active', tool === 'eyedropper');
+        
+        // Update cursor style
+        if (tool === 'eyedropper') {
+            canvas.style.cursor = 'crosshair';
+        } else if (tool === 'pan') {
+            canvas.style.cursor = 'grab';
+        } else {
+            canvas.style.cursor = 'default';
+        }
     }
     eyedropperToolBtn.addEventListener('click', () => setActiveTool('eyedropper'));
     pencilToolBtn.addEventListener('click', () => setActiveTool('pencil'));
     eraserToolBtn.addEventListener('click', () => setActiveTool('eraser'));
+    panToolBtn.addEventListener('click', () => setActiveTool('pan'));
     undoButton.addEventListener('click', undo);
     backgroundToggleBtn.addEventListener('click', toggleBackground);
     
@@ -855,15 +872,97 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     bitmapFileInput.addEventListener('change', handleBitmapFileUpload);
-    canvas.addEventListener('mousedown', (e) => { if (e.button !== 0) return; saveToHistory(); isDrawing = true; drawPixel(getCoords(e).cellX, getCoords(e).cellY); });
-    canvas.addEventListener('mousemove', (e) => { if (isDrawing) { drawPixel(getCoords(e).cellX, getCoords(e).cellY); } });
-    canvas.addEventListener('mouseup', () => { if(isDrawing) isDrawing = false; });
-    canvas.addEventListener('mouseleave', () => { if(isDrawing) isDrawing = false; });
-    // Touch events (simplified for brevity, adapt from draw/script.js if full support needed)
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); saveToHistory(); isDrawing = true; const touch = e.touches[0]; drawPixel(getCoords(touch).cellX, getCoords(touch).cellY); }, { passive: false });
-    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if (isDrawing) { const touch = e.touches[0]; drawPixel(getCoords(touch).cellX, getCoords(touch).cellY); } }, { passive: false });
-    canvas.addEventListener('touchend', (e) => { e.preventDefault(); if(isDrawing) isDrawing = false; });
-    canvas.addEventListener('touchcancel', (e) => { e.preventDefault(); if(isDrawing) isDrawing = false; });
+    canvas.addEventListener('mousedown', (e) => { 
+        if (e.button !== 0) return; 
+        
+        if (selectedTool === 'pan') {
+            isPanning = true;
+            panStartX = e.clientX;
+            panStartY = e.clientY;
+            canvas.style.cursor = 'grabbing';
+        } else {
+            saveToHistory(); 
+            isDrawing = true; 
+            drawPixel(getCoords(e).cellX, getCoords(e).cellY);
+        }
+    });
+    
+    canvas.addEventListener('mousemove', (e) => { 
+        if (isPanning) {
+            const deltaX = Math.round((e.clientX - panStartX) / PIXEL_SIZE);
+            const deltaY = Math.round((e.clientY - panStartY) / PIXEL_SIZE);
+            
+            // Only pan if we've moved at least one pixel
+            if (Math.abs(deltaX) >= 1 || Math.abs(deltaY) >= 1) {
+                panCanvas(deltaX, deltaY);
+                panStartX = e.clientX;
+                panStartY = e.clientY;
+            }
+        } else if (isDrawing) { 
+            drawPixel(getCoords(e).cellX, getCoords(e).cellY); 
+        } 
+    });
+    
+    canvas.addEventListener('mouseup', () => { 
+        if (isPanning) {
+            isPanning = false;
+            canvas.style.cursor = 'grab';
+        }
+        if (isDrawing) isDrawing = false; 
+    });
+    
+    canvas.addEventListener('mouseleave', () => { 
+        if (isPanning) {
+            isPanning = false;
+            canvas.style.cursor = 'grab';
+        }
+        if (isDrawing) isDrawing = false; 
+    });
+    // Touch events with pan support
+    canvas.addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        const touch = e.touches[0];
+        
+        if (selectedTool === 'pan') {
+            isPanning = true;
+            panStartX = touch.clientX;
+            panStartY = touch.clientY;
+        } else {
+            saveToHistory(); 
+            isDrawing = true; 
+            drawPixel(getCoords(touch).cellX, getCoords(touch).cellY);
+        }
+    }, { passive: false });
+    
+    canvas.addEventListener('touchmove', (e) => { 
+        e.preventDefault(); 
+        const touch = e.touches[0];
+        
+        if (isPanning) {
+            const deltaX = Math.round((touch.clientX - panStartX) / PIXEL_SIZE);
+            const deltaY = Math.round((touch.clientY - panStartY) / PIXEL_SIZE);
+            
+            if (Math.abs(deltaX) >= 1 || Math.abs(deltaY) >= 1) {
+                panCanvas(deltaX, deltaY);
+                panStartX = touch.clientX;
+                panStartY = touch.clientY;
+            }
+        } else if (isDrawing) { 
+            drawPixel(getCoords(touch).cellX, getCoords(touch).cellY); 
+        } 
+    }, { passive: false });
+    
+    canvas.addEventListener('touchend', (e) => { 
+        e.preventDefault(); 
+        if (isPanning) isPanning = false;
+        if (isDrawing) isDrawing = false; 
+    });
+    
+    canvas.addEventListener('touchcancel', (e) => { 
+        e.preventDefault(); 
+        if (isPanning) isPanning = false;
+        if (isDrawing) isDrawing = false; 
+    });
     if (artworkTitleElement) { artworkTitleElement.addEventListener('click', function(e) { if (e.target === this || e.target.classList.contains('edit-icon')) { const currentTitle = this.childNodes[0].nodeValue.trim(); const newTitle = prompt("Sprite Name:", currentTitle); if (newTitle !== null && newTitle.trim() !== "") { this.childNodes[0].nodeValue = newTitle.trim() + " ";}}});}
 
     // --- Instructions Drawer Functions ---
@@ -1383,6 +1482,41 @@ Additional Requirements:
         traceOffsetX = 0;
         traceOffsetY = 0;
         showTraceImage();
+    }
+
+    // --- Pan Functions ---
+    function panCanvas(deltaX, deltaY) {
+        // Save current state to history before panning
+        saveToHistory();
+        
+        // Create new grid with shifted pixels
+        const newGrid = Array(GRID_HEIGHT).fill(null).map(() => Array(GRID_WIDTH).fill(null));
+        
+        // Copy pixels to new positions, clipping those outside bounds
+        for (let y = 0; y < GRID_HEIGHT; y++) {
+            for (let x = 0; x < GRID_WIDTH; x++) {
+                const sourceX = x - deltaX;
+                const sourceY = y - deltaY;
+                
+                // Only copy if source is within bounds
+                if (sourceX >= 0 && sourceX < GRID_WIDTH && sourceY >= 0 && sourceY < GRID_HEIGHT) {
+                    newGrid[y][x] = pixelGrid[sourceY][sourceX];
+                }
+            }
+        }
+        
+        // Update the current frame's grid
+        pixelGrid = newGrid;
+        if (currentFrame === 'A') {
+            frameAData = pixelGrid;
+        } else {
+            frameBData = pixelGrid;
+        }
+        
+        // Redraw everything
+        redrawAll();
+        updateUsedColorsPaletteDisplay();
+        updateOnionSkin();
     }
 
     function handleTraceImageUpload(event) {
