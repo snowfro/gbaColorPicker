@@ -277,6 +277,91 @@ body {
     font-size: 14px;
 }
 
+/* AI Prompt Tip Styles */
+.ai-prompt-tip {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+}
+
+.ai-prompt-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.ai-prompt-button:hover {
+    background: #0056b3;
+}
+
+.ai-prompt-content {
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.ai-prompt-content h4 {
+    margin: 0 0 10px 0;
+    color: #495057;
+}
+
+.prompt-instructions {
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.prompt-instructions p {
+    margin: 5px 0;
+    font-weight: 500;
+}
+
+.prompt-text {
+    font-size: 0.85em;
+    line-height: 1.4;
+    color: #212529;
+}
+
+.prompt-text p {
+    margin: 8px 0;
+}
+
+.prompt-text ul {
+    margin: 5px 0 10px 20px;
+    padding: 0;
+}
+
+.prompt-text li {
+    margin: 3px 0;
+}
+
+.copy-prompt-button {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.copy-prompt-button:hover {
+    background: #1e7e34;
+}
+
 /* Mobile responsiveness for drawer */
 @media (max-width: 768px) {
     .instructions-drawer {
@@ -500,7 +585,92 @@ h1, h3 {
 }
 
 .onion-skin-active #onion-skin-btn:hover {
-    background-color: #e67e22;
+    background-color: #27ae60 !important;
+}
+
+/* Tracing Mode Styles */
+#trace-btn {
+    position: relative; /* Needed for absolute positioning of zoom controls */
+}
+
+.tracing-active #trace-btn {
+    background-color: #f39c12;
+    color: white;
+}
+
+.tracing-active #trace-btn:hover {
+    background-color: #e67e22 !important;
+}
+
+#trace-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Behind pixel canvas but above container */
+    pointer-events: none; /* Don't interfere with drawing */
+    opacity: 0.6; /* Semi-transparent for tracing */
+}
+
+/* Trace Zoom Controls */
+.trace-zoom-controls {
+    position: absolute;
+    top: 100%; /* Position directly below the trace button */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    margin-top: 5px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 12px;
+    width: fit-content;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+.zoom-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.zoom-button:hover {
+    background: #2980b9;
+}
+
+.zoom-button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+#zoom-level {
+    min-width: 40px;
+    text-align: center;
+    font-size: 10px;
+    color: #2c3e50;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+}
+
+#zoom-level:hover {
+    background: rgba(0, 0, 0, 0.1);
 }
 
 /* Drawing Area & Canvas - From draw/style.css */
@@ -526,6 +696,13 @@ h1, h3 {
     position: relative;
     margin-left: 60px;
     margin-right: 60px;
+    transition: background 0.2s ease;
+}
+
+/* White background state */
+#canvas-container.white-background {
+    background-color: white;
+    background-image: none;
 }
 
 #pixel-canvas, #onion-skin-canvas {

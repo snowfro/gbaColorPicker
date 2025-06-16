@@ -68,10 +68,71 @@
                 </div>
                 
                 <div class="instruction-section">
+                    <h3>🖼️ Tracing Feature</h3>
+                    
+                    <div class="ai-prompt-tip">
+                        <p><strong>💡 Need inspiration?</strong> <button id="show-ai-prompt" class="ai-prompt-button">Click here</button> for an AI prompt to generate a pixelated reference image!</p>
+                        <div id="ai-prompt-content" class="ai-prompt-content" style="display: none;">
+                            <h4>🤖 How to use with OpenAI Image Generation:</h4>
+                            <div class="prompt-instructions">
+                                <p><strong>Step 1:</strong> Take or find a selfie photo of yourself (face or full body)</p>
+                                <p><strong>Step 2:</strong> Go to OpenAI's image generation tool (others may work but so far OpenAI has worked best).</p>
+                                <p><strong>Step 3:</strong> Upload your selfie photo and copy/paste the prompt below</p>
+                                <p><strong>Step 4:</strong> Download the generated image and import it here for tracing!</p>
+                            </div>
+                            <h4>📋 Copy this prompt:</h4>
+                            <div class="prompt-text">
+                                <p><strong>Input:</strong> A selfie photo of a person (can be just the face).</p>
+                                <p><strong>Output:</strong> A single PNG image exactly 320 pixels wide by 320 pixels tall.</p>
+                                <p>The image must be divided into two 160×320 halves, placed side by side:</p>
+                                <ul>
+                                    <li><strong>Left half (0–159px):</strong> First animation frame</li>
+                                    <li><strong>Right half (160–319px):</strong> Second animation frame</li>
+                                </ul>
+                                <p>Each half should contain a full-body pixelated character not to exceed:</p>
+                                <ul>
+                                    <li><strong>16 pixels wide × 32 pixels tall,</strong></li>
+                                    <li><strong>where each pixel is a perfect 20×20 square,</strong></li>
+                                    <li><strong>aligned precisely to a 20-pixel grid.</strong></li>
+                                </ul>
+                                <p><strong>Animation Style:</strong></p>
+                                <ul>
+                                    <li>By default, choose a simple, visually distinct animation (e.g., waving, bouncing, stepping, blinking).</li>
+                                    <li>If the user specifies an animation type (e.g., jumping, head shake, dance), use that instead.</li>
+                                    <li>The two frames must be cohesive — clearly the same character, same scale, and aligned on the same grid.</li>
+                                </ul>
+                                <p><strong>Additional Requirements:</strong></p>
+                                <ul>
+                                    <li>If the selfie only includes the face, you must generate a plausible full-body form including clothing and pose.</li>
+                                    <li>No padding or transparency — the character must fill their 16×32 grid exactly in each frame.</li>
+                                    <li>Background should be plain white or light gray.</li>
+                                    <li>Use no anti-aliasing — render clean, crisp pixel squares only.</li>
+                                    <li>Save as a PNG for pixel-perfect results.</li>
+                                </ul>
+                            </div>
+                            <button id="copy-prompt" class="copy-prompt-button">📋 Copy Prompt to Clipboard</button>
+                        </div>
+                    </div>
+                    
+                    <ul>
+                        <li><strong>Import Reference:</strong> Click the 🖼️ button to import a photo or image for tracing</li>
+                        <li><strong>Load New Image:</strong> Shift+click the 🖼️ button to replace current reference image</li>
+                        <li><strong>Any Portrait Image:</strong> Upload any portrait photo - it will auto-fit to the canvas</li>
+                        <li><strong>Perfect for Self-Portraits:</strong> Upload a photo of yourself to trace your likeness</li>
+                        <li><strong>Smart Scaling:</strong> Images automatically scale to fit while maintaining proportions</li>
+                        <li><strong>Semi-Transparent Overlay:</strong> Image appears behind your canvas at 60% opacity</li>
+                        <li><strong>Toggle On/Off:</strong> Click 🖼️ again to show/hide the reference image</li>
+                        <li><strong>Zoom Controls:</strong> Use + and - buttons to adjust size (1% steps, Shift+click for 5% steps)</li>
+                        <li><strong>Fine Position Control:</strong> Use arrow keys ←↑↓→ to nudge image (1 pixel, Shift+arrow for 5 pixels)</li>
+                    </ul>
+                </div>
+                
+                <div class="instruction-section">
                     <h3>💾 Saving & Sharing</h3>
                     <ol>
                         <li><strong>Name your sprite:</strong> Click the pencil icon ✏️ next to "My Sprite"</li>
-                        <li><strong>Download PNG:</strong> Get a visual image file</li>
+                        <li><strong>Download PNG:</strong> Get a visual image file (side-by-side frames)</li>
+                        <li><strong>Download GIF:</strong> Get an animated GIF with white background</li>
                         <li><strong>Download Bitmap:</strong> Get the game-compatible .txt file</li>
                         <li><strong>Load Bitmap:</strong> Import a previously saved .txt file</li>
                         <li><strong>Share:</strong> Send your files via email or DM</li>
@@ -184,6 +245,7 @@
                 <button id="pencil-tool" class="tool-button active" title="Paintbrush">🖌️</button>
                 <button id="eraser-tool" class="tool-button" title="Eraser">🧼</button>
                 <button id="undo-button" class="tool-button" title="Undo">↩️</button>
+                <button id="background-toggle" class="tool-button" title="Switch to White Background">🏁</button>
             </div>
             <div class="canvas-and-animation-container">
                 <div id="canvas-container">
@@ -198,7 +260,14 @@
                     <button id="copy-frame-btn" class="tool-button" title="Copy Other Frame to Current">📋</button>
                     <button id="animate-preview-btn" class="tool-button" title="Preview Animation">🎬</button>
                     <button id="onion-skin-btn" class="tool-button" title="Onion Skin Overlay">🧅</button>
+                    <button id="trace-btn" class="tool-button" title="Import Tracing Image (Shift+click to load new image)">🖼️</button>
+                    <div class="trace-zoom-controls" id="trace-zoom-controls" style="display: none;">
+                        <button id="zoom-out-btn" class="zoom-button" title="Zoom Out 1% (Shift: 5%)">−</button>
+                        <span id="zoom-level">100%</span>
+                        <button id="zoom-in-btn" class="zoom-button" title="Zoom In 1% (Shift: 5%)">+</button>
+                    </div>
                 </div>
+                <input type="file" id="trace-file-input" accept="image/*" style="display: none;">
             </div>
         </div>
     </div>

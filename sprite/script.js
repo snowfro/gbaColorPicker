@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const copyFrameBtn = document.getElementById('copy-frame-btn');
     const animatePreviewBtn = document.getElementById('animate-preview-btn');
     const onionSkinBtn = document.getElementById('onion-skin-btn');
+    const traceBtn = document.getElementById('trace-btn');
+    const traceFileInput = document.getElementById('trace-file-input');
+    const traceZoomControls = document.getElementById('trace-zoom-controls');
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const zoomLevelSpan = document.getElementById('zoom-level');
+    const backgroundToggleBtn = document.getElementById('background-toggle');
     
     const downloadPngBtn = document.getElementById('download-png');
     const downloadGifBtn = document.getElementById('download-gif');
@@ -92,6 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let onionSkinEnabled = false;
     let isAnimating = false;
     let animationInterval = null;
+    
+    // Tracing variables
+    let tracingEnabled = false;
+    let traceCanvas = null;
+    let traceImage = null;
+    let traceZoom = 1.0; // 1.0 = 100%, 0.5 = 50%, 2.0 = 200%
+    let traceOffsetX = 0; // X offset in pixels for nudging
+    let traceOffsetY = 0; // Y offset in pixels for nudging
 
     // --- Color Conversion Functions (Shared) ---
     function hsvToRgb(h, s, v) { /* ... from limited/script.js ... */ 
@@ -817,6 +832,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pencilToolBtn.addEventListener('click', () => setActiveTool('pencil'));
     eraserToolBtn.addEventListener('click', () => setActiveTool('eraser'));
     undoButton.addEventListener('click', undo);
+    backgroundToggleBtn.addEventListener('click', toggleBackground);
     
     // Animation control event listeners
     frameABtn.addEventListener('click', () => switchToFrame('A'));
@@ -824,6 +840,11 @@ document.addEventListener('DOMContentLoaded', () => {
     copyFrameBtn.addEventListener('click', copyOtherFrameToCurrent);
     animatePreviewBtn.addEventListener('click', startAnimationPreview);
     onionSkinBtn.addEventListener('click', toggleOnionSkin);
+    traceBtn.addEventListener('click', handleTraceButtonClick);
+    traceFileInput.addEventListener('change', handleTraceImageUpload);
+    zoomInBtn.addEventListener('click', (event) => zoomTraceIn(event));
+    zoomOutBtn.addEventListener('click', (event) => zoomTraceOut(event));
+    zoomLevelSpan.addEventListener('click', resetTraceZoom); // Click zoom level to reset to 100%
     
     downloadPngBtn.addEventListener('click', downloadCanvasAsPNG);
     downloadGifBtn.addEventListener('click', downloadAnimatedGIF);
@@ -926,6 +947,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (welcomeOverlay) {
         welcomeOverlay.addEventListener('click', hideWelcomeModal);
+    }
+
+    // AI Prompt functionality
+    const showAiPromptBtn = document.getElementById('show-ai-prompt');
+    const aiPromptContent = document.getElementById('ai-prompt-content');
+    const copyPromptBtn = document.getElementById('copy-prompt');
+
+    if (showAiPromptBtn && aiPromptContent) {
+        showAiPromptBtn.addEventListener('click', () => {
+            const isVisible = aiPromptContent.style.display !== 'none';
+            aiPromptContent.style.display = isVisible ? 'none' : 'block';
+            showAiPromptBtn.textContent = isVisible ? 'Click here' : 'Hide prompt';
+        });
+    }
+
+    if (copyPromptBtn) {
+        copyPromptBtn.addEventListener('click', async () => {
+            const promptText = `Input: A selfie photo of a person (can be just the face).
+
+Output: A single PNG image exactly 320 pixels wide by 320 pixels tall.
+
+The image must be divided into two 160×320 halves, placed side by side:
+• Left half (0–159px): First animation frame
+• Right half (160–319px): Second animation frame
+
+Each half should contain a full-body pixelated character not to exceed:
+• 16 pixels wide × 32 pixels tall,
+• where each pixel is a perfect 20×20 square,
+• aligned precisely to a 20-pixel grid.
+
+Animation Style:
+• By default, choose a simple, visually distinct animation (e.g., waving, bouncing, stepping, blinking).
+• If the user specifies an animation type (e.g., jumping, head shake, dance), use that instead.
+• The two frames must be cohesive — clearly the same character, same scale, and aligned on the same grid.
+
+Additional Requirements:
+• If the selfie only includes the face, you must generate a plausible full-body form including clothing and pose.
+• No padding or transparency — the character must fill their 16×32 grid exactly in each frame.
+• Background should be plain white or light gray.
+• Use no anti-aliasing — render clean, crisp pixel squares only.
+• Save as a PNG for pixel-perfect results.`;
+
+            try {
+                await navigator.clipboard.writeText(promptText);
+                copyPromptBtn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    copyPromptBtn.textContent = '📋 Copy Prompt to Clipboard';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = promptText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                copyPromptBtn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    copyPromptBtn.textContent = '📋 Copy Prompt to Clipboard';
+                }, 2000);
+            }
+        });
     }
 
     // --- Examples Loading Functions ---
@@ -1132,6 +1216,250 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('onion-skin-active', onionSkinEnabled);
         updateOnionSkin();
     }
+
+    function toggleBackground() {
+        canvasContainer.classList.toggle('white-background');
+        // Update button appearance to show current state
+        if (canvasContainer.classList.contains('white-background')) {
+            backgroundToggleBtn.classList.add('active');
+            backgroundToggleBtn.title = 'Switch to Pattern Background';
+        } else {
+            backgroundToggleBtn.classList.remove('active');
+            backgroundToggleBtn.title = 'Switch to White Background';
+        }
+    }
+
+    // --- Tracing Functions ---
+    function createTraceCanvas() {
+        if (!traceCanvas) {
+            traceCanvas = document.createElement('canvas');
+            traceCanvas.id = 'trace-canvas';
+            traceCanvas.width = GRID_WIDTH * PIXEL_SIZE;
+            traceCanvas.height = GRID_HEIGHT * PIXEL_SIZE;
+            canvasContainer.appendChild(traceCanvas);
+        }
+        return traceCanvas;
+    }
+
+    function showTraceImage() {
+        if (!traceImage || !tracingEnabled) {
+            if (traceCanvas) {
+                traceCanvas.style.display = 'none';
+            }
+            return;
+        }
+
+        const canvas = createTraceCanvas();
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Calculate scaling to fit image while maintaining aspect ratio
+        const imageAspect = traceImage.width / traceImage.height;
+        const canvasAspect = canvas.width / canvas.height;
+        
+        let baseWidth, baseHeight;
+        
+        if (imageAspect > canvasAspect) {
+            // Image is wider relative to canvas - fit to width
+            baseWidth = canvas.width;
+            baseHeight = canvas.width / imageAspect;
+        } else {
+            // Image is taller relative to canvas - fit to height
+            baseHeight = canvas.height;
+            baseWidth = canvas.height * imageAspect;
+        }
+        
+        // Apply zoom scaling
+        const drawWidth = baseWidth * traceZoom;
+        const drawHeight = baseHeight * traceZoom;
+        
+        // Center the zoomed image and apply nudge offsets
+        const offsetX = (canvas.width - drawWidth) / 2 + traceOffsetX;
+        const offsetY = (canvas.height - drawHeight) / 2 + traceOffsetY;
+        
+        // Draw the image centered and scaled
+        ctx.drawImage(traceImage, offsetX, offsetY, drawWidth, drawHeight);
+        
+        canvas.style.display = 'block';
+    }
+
+    function handleTraceButtonClick(event) {
+        if (event.shiftKey && traceImage) {
+            // Shift+click with existing image - load new image
+            const confirmed = confirm('Load a new reference image? This will replace the current one.');
+            if (confirmed) {
+                traceFileInput.click();
+            }
+            return;
+        }
+        
+        // Regular click behavior
+        toggleTracing();
+    }
+
+    function toggleTracing() {
+        if (!traceImage) {
+            // No image loaded, prompt to import
+            traceFileInput.click();
+            return;
+        }
+        
+        // Toggle tracing mode
+        tracingEnabled = !tracingEnabled;
+        document.body.classList.toggle('tracing-active', tracingEnabled);
+        updateZoomControlsVisibility();
+        showTraceImage();
+    }
+
+    function updateZoomControlsVisibility() {
+        if (traceZoomControls) {
+            traceZoomControls.style.display = (tracingEnabled && traceImage) ? 'flex' : 'none';
+        }
+    }
+
+    function updateZoomLevel() {
+        if (zoomLevelSpan) {
+            zoomLevelSpan.textContent = Math.round(traceZoom * 100) + '%';
+        }
+        
+        // Update button states
+        if (zoomOutBtn) {
+            zoomOutBtn.disabled = traceZoom <= 0.25; // Min 25%
+        }
+        if (zoomInBtn) {
+            zoomInBtn.disabled = traceZoom >= 3.0; // Max 300%
+        }
+    }
+
+    function zoomTraceIn(event) {
+        if (traceZoom < 3.0) {
+            const increment = event && event.shiftKey ? 0.05 : 0.01; // 5% if shift, 1% otherwise
+            traceZoom = Math.min(3.0, traceZoom + increment);
+            updateZoomLevel();
+            showTraceImage();
+        }
+    }
+
+    function zoomTraceOut(event) {
+        if (traceZoom > 0.25) {
+            const decrement = event && event.shiftKey ? 0.05 : 0.01; // 5% if shift, 1% otherwise
+            traceZoom = Math.max(0.25, traceZoom - decrement);
+            updateZoomLevel();
+            showTraceImage();
+        }
+    }
+
+    function resetTraceZoom() {
+        traceZoom = 1.0;
+        updateZoomLevel();
+        showTraceImage();
+    }
+
+    // --- Tracing Nudge Functions ---
+    function nudgeTraceLeft(distance = 1) {
+        traceOffsetX -= distance;
+        showTraceImage();
+    }
+
+    function nudgeTraceRight(distance = 1) {
+        traceOffsetX += distance;
+        showTraceImage();
+    }
+
+    function nudgeTraceUp(distance = 1) {
+        traceOffsetY -= distance;
+        showTraceImage();
+    }
+
+    function nudgeTraceDown(distance = 1) {
+        traceOffsetY += distance;
+        showTraceImage();
+    }
+
+    function resetTracePosition() {
+        traceOffsetX = 0;
+        traceOffsetY = 0;
+        showTraceImage();
+    }
+
+    function handleTraceImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const img = new Image();
+        img.onload = function() {
+            // Basic validation - just check if it's a reasonable image size
+            if (img.width < 16 || img.height < 16) {
+                alert(`Image is too small (${img.width}×${img.height}).\nPlease use an image at least 16×16 pixels.`);
+                return;
+            }
+            
+            if (img.width > 2000 || img.height > 2000) {
+                alert(`Image is very large (${img.width}×${img.height}).\nFor better performance, consider using a smaller image.`);
+                // Don't return - still allow it, just warn
+            }
+
+            // Image is valid, store it and enable tracing
+            traceImage = img;
+            tracingEnabled = true;
+            document.body.classList.add('tracing-active');
+            
+            // Reset zoom and position to defaults
+            traceZoom = 1.0;
+            traceOffsetX = 0;
+            traceOffsetY = 0;
+            updateZoomLevel();
+            updateZoomControlsVisibility();
+            showTraceImage();
+            
+            const aspectRatio = (img.width / img.height).toFixed(2);
+            console.log(`Trace image loaded: ${img.width}×${img.height} (aspect ratio: ${aspectRatio})`);
+        };
+
+        img.onerror = function() {
+            alert('Failed to load image. Please try a different file.');
+        };
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+        
+        // Reset file input
+        event.target.value = '';
+    }
+
+    // --- Keyboard Controls for Tracing ---
+    document.addEventListener('keydown', function(event) {
+        // Only respond to arrow keys when tracing is enabled and image is loaded
+        if (!tracingEnabled || !traceImage) return;
+        
+        // Prevent default arrow key behavior (scrolling)
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+            event.preventDefault();
+        }
+        
+        const moveDistance = event.shiftKey ? 5 : 1; // 5 pixels if shift, 1 pixel otherwise
+        
+        switch(event.key) {
+            case 'ArrowLeft':
+                nudgeTraceLeft(moveDistance);
+                break;
+            case 'ArrowRight':
+                nudgeTraceRight(moveDistance);
+                break;
+            case 'ArrowUp':
+                nudgeTraceUp(moveDistance);
+                break;
+            case 'ArrowDown':
+                nudgeTraceDown(moveDistance);
+                break;
+        }
+    });
     
     function startAnimationPreview() {
         if (isAnimating) {
