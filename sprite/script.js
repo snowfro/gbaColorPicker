@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const zoomOutBtn = document.getElementById('zoom-out-btn');
     const zoomLevelSpan = document.getElementById('zoom-level');
     const backgroundToggleBtn = document.getElementById('background-toggle');
+    const gridToggleBtn = document.getElementById('grid-toggle');
     
     const downloadPngBtn = document.getElementById('download-png');
     const downloadGifBtn = document.getElementById('download-gif');
@@ -113,6 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPanning = false;
     let panStartX = 0;
     let panStartY = 0;
+
+    // Grid overlay variables
+    let gridOverlayEnabled = false;
 
     // --- Color Conversion Functions (Shared) ---
     function hsvToRgb(h, s, v) { /* ... from limited/script.js ... */ 
@@ -297,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        drawGridOverlay(); // Draw grid overlay if enabled
         updateOnionSkin(); // Update onion skin when redrawing
     }
     function drawPixel(cellX, cellY) {
@@ -897,6 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
     panToolBtn.addEventListener('click', () => setActiveTool('pan'));
     undoButton.addEventListener('click', undo);
     backgroundToggleBtn.addEventListener('click', toggleBackground);
+    gridToggleBtn.addEventListener('click', toggleGrid);
     
     // Animation control event listeners
     frameABtn.addEventListener('click', () => switchToFrame('A'));
@@ -1379,6 +1385,40 @@ Additional Requirements:
             backgroundToggleBtn.classList.remove('active');
             backgroundToggleBtn.title = 'Switch to White Background';
         }
+    }
+
+    function toggleGrid() {
+        gridOverlayEnabled = !gridOverlayEnabled;
+        gridToggleBtn.classList.toggle('active', gridOverlayEnabled);
+        redrawAll(); // Redraw to show/hide grid
+    }
+
+    function drawGridOverlay() {
+        if (!gridOverlayEnabled) return;
+        
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)'; // Semi-transparent black
+        ctx.lineWidth = 0.5; // Very thin lines
+        
+        // Draw vertical lines
+        for (let x = 0; x <= GRID_WIDTH; x++) {
+            const xPos = x * PIXEL_SIZE;
+            ctx.beginPath();
+            ctx.moveTo(xPos, 0);
+            ctx.lineTo(xPos, GRID_HEIGHT * PIXEL_SIZE);
+            ctx.stroke();
+        }
+        
+        // Draw horizontal lines
+        for (let y = 0; y <= GRID_HEIGHT; y++) {
+            const yPos = y * PIXEL_SIZE;
+            ctx.beginPath();
+            ctx.moveTo(0, yPos);
+            ctx.lineTo(GRID_WIDTH * PIXEL_SIZE, yPos);
+            ctx.stroke();
+        }
+        
+        ctx.restore();
     }
 
     // --- Tracing Functions ---
