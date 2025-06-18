@@ -135,7 +135,7 @@
                         <li><strong>Submit your creation:</strong> Click the "Submit Your Sprite" button at the bottom of the page. This will open a Google Form.</li>
                         <li><strong>Copy bitmap content:</strong> Open the downloaded `.txt` file, select all text (Ctrl+A or Cmd+A), and copy it (Ctrl+C or Cmd+C).</li>
                         <li><strong>Fill the form:</strong> Paste the bitmap content into the form and fill out the other fields. </li>
-                        <li><strong>Load to re-edit:</strong> You can always load a saved bitmap `.txt` file later to continue editing.</li>
+                        <li><strong>Load to re-edit:</strong> You can always load a saved bitmap `.txt` file later to continue editing (or Shift+click to paste directly).</li>
                     </ol>
                 </div>
                 
@@ -144,6 +144,7 @@
                     <ul>
                         <li><strong>Undo:</strong> Use the ↩️ button to undo mistakes</li>
                         <li><strong>Pan Tool:</strong> Use ✋ to move your entire drawing around the canvas</li>
+                        <li><strong>Quick Load:</strong> Shift+click "Load Bitmap String" to paste bitmap data directly</li>
                         <li><strong>Eyedropper:</strong> Sample colors from your existing drawing</li>
                         <li><strong>Used Colors:</strong> See all colors you've used in the bottom panel</li>
                         <li><strong>Color Info:</strong> Hover over palette colors to see their index numbers</li>
@@ -233,7 +234,7 @@
                 <button id="download-png">Download PNG</button>
                 <button id="download-gif">Download GIF</button>
                 <button id="download-bitmap-btn">Download Bitmap String</button> 
-                <button id="upload-bitmap-btn">Load Bitmap String</button>
+                <button id="upload-bitmap-btn" title="Load Bitmap String (Shift+click to paste directly)">Load Bitmap String</button>
             </div>
             <input type="file" id="bitmap-file-input" accept=".txt" style="display: none;">
         </div>

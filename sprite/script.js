@@ -721,6 +721,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Function to handle bitmap string upload --- 
+    function handleBitmapStringPaste() {
+        const bitmapString = prompt("Paste your bitmap string here:");
+        if (!bitmapString) {
+            return; // User cancelled or entered empty string
+        }
+
+        const singleFrameLength = GRID_WIDTH * GRID_HEIGHT * 2; // 16*32*2 = 1024
+        const twoFrameLength = singleFrameLength * 2; // 1024 * 2 = 2048
+        const sanitizedContent = bitmapString.replace(/\s+/g, ''); // Remove any whitespace
+
+        // Check if it's single frame or two frame
+        let isDoubleFrame = false;
+        if (sanitizedContent.length === singleFrameLength) {
+            isDoubleFrame = false;
+        } else if (sanitizedContent.length === twoFrameLength) {
+            isDoubleFrame = true;
+        } else {
+            alert(`Error: Bitmap string has incorrect length. Expected ${singleFrameLength} characters (single frame) or ${twoFrameLength} characters (two frames), got ${sanitizedContent.length}.`);
+            return;
+        }
+
+        if (!/^[0-9A-Fa-f]+$/.test(sanitizedContent)) {
+            alert("Error: Bitmap string contains invalid characters. Only hex characters (0-9, A-F) are allowed.");
+            return;
+        }
+
+        // Clear existing grid and history
+        setupPixelGridData(); // This clears both frames, usedColors, and updates display
+        
+        // Load Frame A (always present)
+        loadFrameFromString(sanitizedContent.substring(0, singleFrameLength), 'A');
+        
+        // Load Frame B if it's a two-frame sprite
+        if (isDoubleFrame) {
+            loadFrameFromString(sanitizedContent.substring(singleFrameLength), 'B');
+            alert("Loaded two-frame sprite successfully!");
+        } else {
+            alert("Loaded single-frame sprite into Frame A successfully!");
+        }
+        
+        // Ensure we're viewing Frame A after loading
+        switchToFrame('A');
+        redrawAll();
+        updateUsedColorsPaletteDisplay();
+        updateOnionSkin();
+    }
+
     function handleBitmapFileUpload(event) {
         const file = event.target.files[0];
         if (!file) {
@@ -866,9 +913,15 @@ document.addEventListener('DOMContentLoaded', () => {
     downloadPngBtn.addEventListener('click', downloadCanvasAsPNG);
     downloadGifBtn.addEventListener('click', downloadAnimatedGIF);
     downloadBitmapBtn.addEventListener('click', downloadBitmapString);
-    uploadBitmapBtn.addEventListener('click', () => {
-        if (confirm("This will replace the current sprite. Are you sure?")) {
-            bitmapFileInput.click();
+    uploadBitmapBtn.addEventListener('click', (event) => {
+        if (event.shiftKey) {
+            // Shift+click: Prompt for direct paste
+            handleBitmapStringPaste();
+        } else {
+            // Normal click: File upload
+            if (confirm("This will replace the current sprite. Are you sure?")) {
+                bitmapFileInput.click();
+            }
         }
     });
     bitmapFileInput.addEventListener('change', handleBitmapFileUpload);
